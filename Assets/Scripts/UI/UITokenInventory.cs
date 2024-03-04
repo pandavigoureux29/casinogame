@@ -23,11 +23,26 @@ public class UITokenInventory : MonoBehaviour
     {
         var inventory = m_isLocal ? localInventory : otherInventory;    
 
+        if(inventory == null || inventory.Inventory == null)
+        {
+            return;
+        }
+
         foreach (var token in inventory.Inventory.tokens)
         {
             var go = Instantiate(m_tokenPrefab, transform);
             var uiToken = go.GetComponent<UIToken>();
-            uiToken.InitializeToken(token);
+            uiToken.InitializeToken(this, token);
         }
+    }
+
+    public void OnAddBetStacked(UIToken token)
+    {
+
+    }
+
+    public void OnRemoveBetStacked(UIToken token)
+    {
+
     }
 }

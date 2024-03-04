@@ -8,6 +8,8 @@ using System;
 
 public class GameManager : MonoBehaviour, IPunObservable
 {
+    //probably best in a config 
+    public static int S_BET_INCREMENTS = 10;
 
     private PhotonView myPhotonView;
 
