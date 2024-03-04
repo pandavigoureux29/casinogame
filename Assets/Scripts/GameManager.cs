@@ -102,6 +102,11 @@ public class GameManager : MonoBehaviour, IPunObservable
         }
     }
 
+    public void ConfirmBet(Dictionary<string, int> tokens)
+    {
+
+    }
+
     void IPunObservable.OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
         //We could send other player's mouse position in here

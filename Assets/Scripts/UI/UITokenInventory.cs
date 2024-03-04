@@ -14,6 +14,8 @@ public class UITokenInventory : MonoBehaviour
     [SerializeField]
     private bool m_isLocal;
 
+    Dictionary<string, int> m_betTokens = new Dictionary<string, int>();
+
     private void Awake()
     {
         m_gameManager.OnInventoriesInitialized += OnInventoriesInitialized;
@@ -38,11 +40,27 @@ public class UITokenInventory : MonoBehaviour
 
     public void OnAddBetStacked(UIToken token)
     {
-
+        if(!m_betTokens.ContainsKey(token.Id))
+        {
+            m_betTokens[token.Id] = 0;
+        }
+        m_betTokens[token.Id]++;
     }
 
     public void OnRemoveBetStacked(UIToken token)
     {
+        if (m_betTokens.ContainsKey(token.Id))
+        {
+            m_betTokens[token.Id]--;
+            if (m_betTokens[token.Id] == 0)
+            {
+                m_betTokens.Remove(token.Id);
+            }
+        }
+    }
 
+    public void OnConfirmBet()
+    {
+        m_gameManager.ConfirmBet(m_betTokens);
     }
 }
