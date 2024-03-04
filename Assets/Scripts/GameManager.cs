@@ -26,6 +26,15 @@ public class GameManager : MonoBehaviour, IPunObservable
         {
             StartGame();
         }
+
+        if (Input.GetMouseButtonDown(0))
+        {
+            var chip = m_gridManager.GetClickedChip();
+            if(chip != null)
+            {
+                FlipChip(chip.Index);
+            }
+        }
     }
 
     public void StartGame()
@@ -45,6 +54,21 @@ public class GameManager : MonoBehaviour, IPunObservable
     {
         m_gridManager.InstantiateGrid(greenIndexes.ToList());
         StartGame();
+    }
+
+    [PunRPC]
+    private void FlipChip(int chipIndex)
+    {
+        m_gridManager.FlipChip(chipIndex);
+
+        if (PhotonNetwork.IsMasterClient)
+        {
+            myPhotonView?.RPC("FlipChip", RpcTarget.Others, chipIndex);
+        }
+        else
+        {
+            myPhotonView?.RPC("FlipChip", RpcTarget.MasterClient, chipIndex);
+        }
     }
 
     void IPunObservable.OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)

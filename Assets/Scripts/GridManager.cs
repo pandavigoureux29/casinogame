@@ -14,6 +14,8 @@ public class GridManager : MonoBehaviour
     [SerializeField]
     private float m_chipSpacing = 2;
 
+    private List<ReversableChip> m_chips;
+
     private List<int> m_greenIndexes;
     public List<int> GreenIndexes => m_greenIndexes;
 
@@ -27,6 +29,8 @@ public class GridManager : MonoBehaviour
         {
             m_greenIndexes = greenIndexes.ToList();
         }
+
+        m_chips = new List<ReversableChip> (); 
 
         var currentGreenIndex = 0;
         Vector3 chipPosition = Vector3.zero;
@@ -56,6 +60,8 @@ public class GridManager : MonoBehaviour
             chipPosition.x = column * m_chipSpacing;
             chipPosition.z = row * m_chipSpacing;
             go.transform.localPosition = chipPosition;
+
+            m_chips.Add( chip );
         }
     }
 
@@ -69,6 +75,29 @@ public class GridManager : MonoBehaviour
             {
                 m_greenIndexes.Add(i);
             }
+        }
+    }
+
+    public ReversableChip GetClickedChip()
+    {
+        Ray ray;
+        RaycastHit hit;
+
+        ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        if(Physics.Raycast(ray, out hit))
+        {
+            var go = hit.collider.gameObject;
+            var chip = go.GetComponent<ReversableChip>();
+            return chip;
+        }
+        return null;
+    }
+
+    public void FlipChip(int index)
+    {
+        if(index < m_chips.Count)
+        {
+            m_chips[index].Flip();
         }
     }
 }
