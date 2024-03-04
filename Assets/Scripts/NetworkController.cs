@@ -38,7 +38,6 @@ public class NetworkController : MonoBehaviourPunCallbacks
 		if (PhotonNetwork.IsMasterClient)
 		{
 			m_gameManager.StartGame();
-
         }
     }
 
