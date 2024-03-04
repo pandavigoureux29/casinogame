@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using System.Linq;
+using Photon.Realtime;
+using System;
 
 public class GameManager : MonoBehaviour, IPunObservable
 {
@@ -11,6 +13,15 @@ public class GameManager : MonoBehaviour, IPunObservable
 
     [SerializeField]
     GridManager m_gridManager;
+    [SerializeField]
+    PlayerInventorySO m_inventorySO;
+
+    PlayerInventory m_localPlayerInventory;
+    PlayerInventory m_otherPlayerInventory;
+
+    Player m_currentPlayer;
+
+    public Action<PlayerInventory, PlayerInventory> OnInventoriesInitialized;
 
     // Start is called before the first frame update
     void Start()
@@ -40,7 +51,7 @@ public class GameManager : MonoBehaviour, IPunObservable
     public void StartGame()
     {
         Debug.Log("Start Game");
-
+        InitializePlayers();
 
         if (PhotonNetwork.IsMasterClient)
         {
@@ -54,6 +65,24 @@ public class GameManager : MonoBehaviour, IPunObservable
     {
         m_gridManager.InstantiateGrid(greenIndexes.ToList());
         StartGame();
+    }
+
+    private void InitializePlayers()
+    {
+        for (int i = 0; i < PhotonNetwork.PlayerList.Count() ; i++)
+        {
+            var inventory = new PlayerInventory(PhotonNetwork.PlayerList[i].UserId, Instantiate(m_inventorySO));
+            if (PhotonNetwork.PlayerList[i].UserId == PhotonNetwork.LocalPlayer.UserId)
+            {
+                m_localPlayerInventory = inventory;
+            }
+            else
+            {
+                m_otherPlayerInventory = inventory;
+            }
+        }
+
+        OnInventoriesInitialized?.Invoke(m_localPlayerInventory, m_otherPlayerInventory);
     }
 
     [PunRPC]
@@ -73,6 +102,6 @@ public class GameManager : MonoBehaviour, IPunObservable
 
     void IPunObservable.OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
-        
+        //We could send other player's mouse position in here
     }
 }

@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b6def9bcdc9a76429853fb0eda4b52b, type: 3}
+  m_Name: PlayerInventory
+  m_EditorClassIdentifier: 
+  tokens:
+  - Id: Blue
+    Quantity: 10
+    Color: {r: 0.16313633, g: 0.24447708, b: 0.735849, a: 1}
+  - Id: BlueSky
+    Quantity: 10
+    Color: {r: 0.07440368, g: 0.78799, b: 0.8301887, a: 1}
+  - Id: Purple
+    Quantity: 10
+    Color: {r: 0.35740927, g: 0.15699539, b: 0.6792453, a: 1}
+  - Id: Yellow
+    Quantity: 10
+    Color: {r: 0.8301887, g: 0.7736295, b: 0.08223567, a: 1}
+  - Id: Pink
+    Quantity: 10
+    Color: {r: 0.86420465, g: 0.11053756, b: 0.8679245, a: 1}
+  - Id: Orange
+    Quantity: 10
+    Color: {r: 0.8962264, g: 0.58665615, b: 0.18178178, a: 1}
+  - Id: Brown
+    Quantity: 10
+    Color: {r: 0.46226418, g: 0.23991169, b: 0.054512277, a: 1}
+  - Id: Greenish
+    Quantity: 10
+    Color: {r: 0.07863116, g: 0.8773585, b: 0.50783336, a: 1}
+  - Id: BigBlue
+    Quantity: 10
+    Color: {r: 0.038892854, g: 0.08299186, b: 0.3584906, a: 1}
+  - Id: Gold
+    Quantity: 10
+    Color: {r: 0.3584906, g: 0.31744403, b: 0, a: 1}
