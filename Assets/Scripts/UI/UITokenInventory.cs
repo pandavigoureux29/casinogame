@@ -11,6 +11,9 @@ public class UITokenInventory : MonoBehaviour
     [SerializeField]
     private UIToken m_tokenPrefab;
 
+    [SerializeField]
+    private bool m_isLocal;
+
     private void Awake()
     {
         m_gameManager.OnInventoriesInitialized += OnInventoriesInitialized;
@@ -18,7 +21,9 @@ public class UITokenInventory : MonoBehaviour
 
     private void OnInventoriesInitialized(PlayerInventory localInventory, PlayerInventory otherInventory)
     {
-        foreach (var token in localInventory.Inventory.tokens)
+        var inventory = m_isLocal ? localInventory : otherInventory;    
+
+        foreach (var token in inventory.Inventory.tokens)
         {
             var go = Instantiate(m_tokenPrefab, transform);
             var uiToken = go.GetComponent<UIToken>();
