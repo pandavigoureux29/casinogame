@@ -10,6 +10,9 @@ public class NetworkController : MonoBehaviourPunCallbacks
 
 	public PhotonView playerPrefab;
 
+	[SerializeField]
+	private GameManager m_gameManager;
+
 	// Start is called before the first frame update
 	void Start()
 	{
@@ -32,6 +35,11 @@ public class NetworkController : MonoBehaviourPunCallbacks
     {
         base.OnPlayerEnteredRoom(newPlayer);
         Debug.Log("Other Player Joined this room.");
+		if (PhotonNetwork.IsMasterClient)
+		{
+			m_gameManager.StartGame();
+
+        }
     }
 
 }
