@@ -45,6 +45,8 @@ MonoBehaviour:
   - RPC_RemoveTokenFromBet
   - SelectChip
   - RPC_SelectChip
+  - RPC_ConfirmBet
+  - RPC_DeclareBet
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1

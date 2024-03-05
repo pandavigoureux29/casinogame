@@ -7,10 +7,19 @@ The NetworkController handles the connection. Once both players are connected, i
 The GameManager begin by telling the GridManager to generate the grid on MasterClient. Once it's done, it gets the indexes where there are green chips and sends it to the 
 other player via an RPC. The client can then begin generating its own grid with these infos
 
-GameManager handles all the RPCs. It's kind of the hub for any action we wanna take in the game
+GameManager handles all the RPCs. It's kind of the hub for any action we wanna take in the game. This code could be split but for the sake of this exercise I decided to centralize the RPCs.
+
+The GameManager on the MasterClient ensures the players cannot bet more than they have so the Client cannot cheat by sending corrupt data.
+
+Flow:
+1. Player adds/remove Tokens that they wanna be (AddTokenToBet/RemoveTokenFromBet in GameManager)
+2. They select a chip to bet on (SelectChip in GameManager)
+
+Notes: 
+- Somehow, the UserId of players was null for the client on both Master and client. That's why I'm using ActorNumber instead which seems to be working.
 
 TODO
-Turns
-Select tile to bet on
 BET
+Compute earnings
+Check turn before betting ( UI and MasterClient )
 

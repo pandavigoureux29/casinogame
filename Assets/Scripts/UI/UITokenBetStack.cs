@@ -36,9 +36,20 @@ public class UITokenBetStack : MonoBehaviour
         var tokenImage = list.LastOrDefault();
         list.Remove(tokenImage);
 
-        tokenImage.gameObject.SetActive(false);
-        tokenImage.transform.SetAsLastSibling();
-        m_tokenPool.Add(tokenImage);
+        ReleaseToPool(tokenImage);
+    }
+
+    public void ClearStack()
+    {
+        foreach(string key in m_tokens.Keys)
+        {
+            var list = m_tokens[key];
+            foreach(Image image in list)
+            {
+                ReleaseToPool(image);
+            }
+            list.Clear();
+        }
     }
 
     private Image TakeTokenFromPool()
@@ -53,4 +64,12 @@ public class UITokenBetStack : MonoBehaviour
         m_tokenPool.RemoveAt(0);
         return token;
     }
+
+    private void ReleaseToPool(Image image)
+    {
+        image.gameObject.SetActive(false);
+        image.transform.SetAsLastSibling();
+        m_tokenPool.Add(image);
+    }
+
 }

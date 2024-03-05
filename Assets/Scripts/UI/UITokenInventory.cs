@@ -27,14 +27,16 @@ public class UITokenInventory : MonoBehaviour
         m_gameManager.OnInventoriesInitialized += OnInventoriesInitialized;
         m_gameManager.OnAddTokenToBet += OnAddBetEvent;
         m_gameManager.OnRemoveTokenFromBet += OnRemoveBetEvent;
+        m_gameManager.OnBetConfirmed += OnBetConfirmed;
     }
 
     private void OnDestroy()
     {
         if (m_gameManager != null)
         {
-            m_gameManager.OnAddTokenToBet += OnAddBetEvent;
+            m_gameManager.OnAddTokenToBet -= OnAddBetEvent;
             m_gameManager.OnRemoveTokenFromBet -= OnRemoveBetEvent;
+            m_gameManager.OnBetConfirmed -= OnBetConfirmed;
         }
     }
 
@@ -97,11 +99,6 @@ public class UITokenInventory : MonoBehaviour
             m_gameManager.RemoveTokenFromBet(m_inventory, token.Id);
     }
 
-    public void OnConfirmBet()
-    {
-        m_gameManager.ConfirmBet(m_betTokensCount);
-    }
-
     //from rpc
     private void OnAddBetEvent(string userId, string tokenId)
     {
@@ -130,6 +127,15 @@ public class UITokenInventory : MonoBehaviour
         {
             uiToken.UpdateRemoveBet();
             OnRemoveBetStacked(uiToken, false);
+        }
+    }
+
+    private void OnBetConfirmed()
+    {
+        m_tokenBetStack.ClearStack();
+        foreach(var uiToken in m_uiTokens)
+        {
+            uiToken.UpdateQuantity();
         }
     }
 

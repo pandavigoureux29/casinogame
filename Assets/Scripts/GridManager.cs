@@ -110,6 +110,16 @@ public class GridManager : MonoBehaviour
         return !chip.IsFlipped;
     }
 
+    public bool CheckChip(int index, ReversableChip.EColor color)
+    {
+        if (index >= m_chips.Count)
+            return false;
+
+        var chip = m_chips[index];
+
+        return !chip.IsFlipped && chip.Color == color;
+    }
+
     public void FlipChip(int index)
     {
         m_selectorObject.SetActive(false);
