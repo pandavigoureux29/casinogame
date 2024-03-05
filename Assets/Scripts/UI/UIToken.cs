@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.VisualScripting.Antlr3.Runtime;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -17,6 +18,7 @@ public class UIToken : MonoBehaviour
 
     private UITokenInventory m_uiTokenInventory;
     private Token m_token;
+    public Token Token => m_token;
 
     private string m_id;
     public string Id => m_id;

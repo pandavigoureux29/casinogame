@@ -283,6 +283,7 @@ MonoBehaviour:
   m_tokenPrefab: {fileID: 3323179424209286236, guid: 6c2d15a661ac2e84e868300b99483289,
     type: 3}
   m_isLocal: 0
+  m_tokenBetStack: {fileID: 0}
 --- !u!114 &374405908
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -633,6 +634,7 @@ MonoBehaviour:
   m_tokenPrefab: {fileID: 3323179424209286236, guid: 6c2d15a661ac2e84e868300b99483289,
     type: 3}
   m_isLocal: 1
+  m_tokenBetStack: {fileID: 1051846251}
 --- !u!114 &896408377
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -784,6 +786,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1051846249}
   - component: {fileID: 1051846250}
+  - component: {fileID: 1051846251}
   m_Layer: 5
   m_Name: BetUI
   m_TagString: Untagged
@@ -804,6 +807,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1107269082}
+  - {fileID: 1997338979}
   m_Father: {fileID: 338322118}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -838,6 +842,21 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!114 &1051846251
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1051846248}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b09ff812aff80a24183395f13a2f1302, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_tokenPrefab: {fileID: 6871479792102899419, guid: ef4386d1f8c4d144286c91fcccbe4d3a,
+    type: 3}
+  m_tokensContainer: {fileID: 1997338979}
 --- !u!1 &1107269081
 GameObject:
   m_ObjectHideFlags: 0
@@ -1435,7 +1454,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1602014223}
   m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 14, z: 0}
+  m_LocalPosition: {x: 0, y: 16, z: -0.57}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1487,6 +1506,12 @@ PrefabInstance:
       propertyPath: m_gridManager
       value: 
       objectReference: {fileID: 2082482208}
+    - target: {fileID: 818304669610142737, guid: bfe62ee198db69d45ac1d8aa2603911b,
+        type: 3}
+      propertyPath: m_inventorySO
+      value: 
+      objectReference: {fileID: 11400000, guid: 4daeb3306929c0949911ea814a2b909e,
+        type: 2}
     - target: {fileID: 827048021340141961, guid: bfe62ee198db69d45ac1d8aa2603911b,
         type: 3}
       propertyPath: sceneViewId
@@ -1566,6 +1591,69 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4eeed84d98aa9414991f23be028400a2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &1997338978
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1997338979}
+  - component: {fileID: 1997338980}
+  m_Layer: 5
+  m_Name: Tokens
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1997338979
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1997338978}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1051846249}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1997338980
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1997338978}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30649d3a9faa99c48a7b1166b86bf2a0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Padding:
+    m_Left: 0
+    m_Right: 0
+    m_Top: 0
+    m_Bottom: 0
+  m_ChildAlignment: 0
+  m_Spacing: -37.1
+  m_ChildForceExpandWidth: 1
+  m_ChildForceExpandHeight: 1
+  m_ChildControlWidth: 0
+  m_ChildControlHeight: 0
+  m_ChildScaleWidth: 0
+  m_ChildScaleHeight: 0
+  m_ReverseArrangement: 0
 --- !u!1 &2082482207
 GameObject:
   m_ObjectHideFlags: 0
