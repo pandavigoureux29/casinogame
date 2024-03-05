@@ -31,7 +31,26 @@ public class BetManager : MonoBehaviour, IPunObservable
 
     public void AddTokenToBet(PlayerInventory playerInventory, string tokenId)
     {
+        if (PhotonNetwork.IsMasterClient)
+        {
+            AddTokenOnMaster(tokenId);
+        }
+
         myPhotonView?.RPC("RPC_AddTokenToBet", RpcTarget.Others, playerInventory.UserId, tokenId);
+    }
+
+    private void AddTokenOnMaster(string tokenId)
+    {
+        if (!m_betTokensCount.ContainsKey(tokenId))
+        {
+            m_betTokensCount[tokenId] = 0;
+        }
+
+        var currentBet = m_betTokensCount[tokenId] * S_BET_INCREMENTS;
+        if (m_gameManager.GetInventory(m_gameManager.GetCurrentInventory().UserId).CanBetMore(tokenId, currentBet))
+        {
+            m_betTokensCount[tokenId]++;
+        }
     }
 
     [PunRPC]
@@ -39,25 +58,26 @@ public class BetManager : MonoBehaviour, IPunObservable
     {
         if (PhotonNetwork.IsMasterClient)
         {
-            if (!m_betTokensCount.ContainsKey(tokenId))
-            {
-                m_betTokensCount[tokenId] = 0;
-            }
-
-            var currentBet = m_betTokensCount[tokenId] * S_BET_INCREMENTS;
-            if (m_gameManager.GetInventory(userId).CanBetMore(tokenId, currentBet))
-            {
-                m_betTokensCount[tokenId]++;
-            }
-            else
-            {
-                return;
-            }
+            AddTokenOnMaster(tokenId);
         }
+
         OnAddTokenToBet?.Invoke(userId, tokenId);
     }
+
+    private void RemoveTokenOnMaster(string tokenId)
+    {
+        if (!m_betTokensCount.ContainsKey(tokenId) || m_betTokensCount[tokenId] == 0)
+            return;
+
+        m_betTokensCount[tokenId]--;
+    }
+
     public void RemoveTokenFromBet(PlayerInventory playerInventory, string tokenId)
     {
+        if (PhotonNetwork.IsMasterClient)
+        {
+            RemoveTokenOnMaster(tokenId);   
+        }
 
         myPhotonView?.RPC("RPC_RemoveTokenFromBet", RpcTarget.Others, playerInventory.UserId, tokenId);
     }
@@ -67,10 +87,7 @@ public class BetManager : MonoBehaviour, IPunObservable
     {
         if (PhotonNetwork.IsMasterClient)
         {
-            if (!m_betTokensCount.ContainsKey(tokenId) || m_betTokensCount[tokenId] == 0)
-                return;
-
-            m_betTokensCount[tokenId]--;
+            RemoveTokenOnMaster(tokenId);
         }
 
         OnRemoveTokenFromBet?.Invoke(userId, tokenId);

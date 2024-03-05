@@ -14,7 +14,7 @@ public class UIToken : MonoBehaviour
     private TextMeshProUGUI m_quantityText;
 
     [SerializeField]
-    private Button m_takeChipsButton;
+    private GameObject m_buttonsContainer;
 
     private UITokenInventory m_uiTokenInventory;
     private Token m_token;
@@ -32,6 +32,11 @@ public class UIToken : MonoBehaviour
         m_image.color = token.Color;
         UpdateQuantity(token.Quantity);
         m_token = token;
+    }
+
+    public void Toggle(bool toggle)
+    {
+        m_buttonsContainer.SetActive(toggle);
     }
 
     public void UpdateQuantity(int qty)
@@ -77,4 +82,8 @@ public class UIToken : MonoBehaviour
         UpdateQuantity();
     }
 
+    public void ClearBetStacks()
+    {
+        m_betStacks = 0;
+    }
 }

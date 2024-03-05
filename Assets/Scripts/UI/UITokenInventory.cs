@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class UITokenInventory : MonoBehaviour
 {
@@ -17,6 +18,9 @@ public class UITokenInventory : MonoBehaviour
     [SerializeField]
     private UITokenBetStack m_tokenBetStack;
 
+    [SerializeField]
+    private Button m_betButton;
+
     private PlayerInventory m_inventory;
 
     private List<UIToken> m_uiTokens = new List<UIToken>();
@@ -29,6 +33,7 @@ public class UITokenInventory : MonoBehaviour
         m_gameManager.BetManager.OnRemoveTokenFromBet += OnRemoveBetEvent;
         m_gameManager.BetManager.OnBetConfirmed += OnBetConfirmed;
         m_gameManager.OnInventoryUpdated += OnInventoryUpdated;
+        m_gameManager.OnTurnChanged += OnTurnChanged;
     }
 
     private void OnDestroy()
@@ -39,6 +44,7 @@ public class UITokenInventory : MonoBehaviour
             m_gameManager.BetManager.OnRemoveTokenFromBet -= OnRemoveBetEvent;
             m_gameManager.BetManager.OnBetConfirmed -= OnBetConfirmed;
             m_gameManager.OnInventoryUpdated -= OnInventoryUpdated;
+            m_gameManager.OnTurnChanged -= OnTurnChanged;
         }
     }
 
@@ -134,6 +140,7 @@ public class UITokenInventory : MonoBehaviour
 
     private void OnBetConfirmed(bool isBetWon)
     {
+        m_betTokensCount.Clear();
         m_tokenBetStack.ClearStack();
     }
 
@@ -143,9 +150,25 @@ public class UITokenInventory : MonoBehaviour
         {
             foreach (var uiToken in m_uiTokens)
             {
+                uiToken.ClearBetStacks();
                 uiToken.UpdateQuantity();
             }
 
+        }
+    }
+
+    public void OnTurnChanged(string userId)
+    {
+        bool toggle = m_inventory.UserId == userId;
+
+        foreach (var uiToken in m_uiTokens)
+        {
+            uiToken.Toggle(toggle);
+        }
+
+        if(m_betButton != null)
+        {
+            m_betButton.interactable = toggle;
         }
     }
 

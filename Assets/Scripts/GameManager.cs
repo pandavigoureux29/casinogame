@@ -8,6 +8,7 @@ using System;
 using Unity.VisualScripting.Antlr3.Runtime;
 using Newtonsoft.Json.Linq;
 using UnityEngine.Rendering.LookDev;
+using Unity.VisualScripting;
 
 public class GameManager : MonoBehaviour, IPunObservable
 {
@@ -151,14 +152,14 @@ public class GameManager : MonoBehaviour, IPunObservable
             inventory.UpdateQuantities(betTokensCount,win);
             SendCurrentInventoryUpdate();
             OnInventoryUpdated?.Invoke(inventory);
+
+            ChangeTurn();
         }
         else 
         { 
             //set the current player on client
             m_currentPlayer = PhotonNetwork.PlayerList.First(x => x.ActorNumber == turnPlayerId);
         }
-
-        ChangeTurn();
         OnTurnChanged?.Invoke(m_currentPlayer.ActorNumber.ToString());
     }
 
