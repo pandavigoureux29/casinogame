@@ -24,6 +24,8 @@ public class GameManager : MonoBehaviour, IPunObservable
     Player m_currentPlayer;
 
     public Action<PlayerInventory, PlayerInventory> OnInventoriesInitialized;
+    public Action<string, string> OnAddTokenToBet;
+    public Action<string, string> OnRemoveTokenFromBet;
 
     // Start is called before the first frame update
     void Start()
@@ -43,7 +45,7 @@ public class GameManager : MonoBehaviour, IPunObservable
         if (Input.GetMouseButtonDown(0))
         {
             var chip = m_gridManager.GetClickedChip();
-            if(chip != null)
+            if (chip != null)
             {
                 FlipChip(chip.Index);
             }
@@ -53,28 +55,33 @@ public class GameManager : MonoBehaviour, IPunObservable
     public void StartGame()
     {
         Debug.Log("Start Game");
-        InitializePlayers();
 
         if (PhotonNetwork.IsMasterClient)
         {
+            var userIds = PhotonNetwork.PlayerList.Select(x => x.ActorNumber).ToArray();
+            InitializePlayers(userIds);
             m_gridManager.InstantiateGrid();
-            myPhotonView?.RPC("RPC_StartGame", RpcTarget.Others, m_gridManager.GreenIndexes.ToArray());
+            myPhotonView?.RPC("RPC_StartGame", RpcTarget.Others, 
+                m_gridManager.GreenIndexes.ToArray(),
+                userIds); //workaround since some UserId are null on client
         }
     }
 
     [PunRPC]
-    public void RPC_StartGame(int[] greenIndexes)
+    public void RPC_StartGame(int[] greenIndexes, int[] userIds)
     {
+        InitializePlayers(userIds);
         m_gridManager.InstantiateGrid(greenIndexes.ToList());
+
         StartGame();
     }
 
-    private void InitializePlayers()
+    private void InitializePlayers(int[] userIds)
     {
-        for (int i = 0; i < PhotonNetwork.PlayerList.Count() ; i++)
+        for (int i = 0; i < userIds.Count(); i++)
         {
-            var inventory = new PlayerInventory(PhotonNetwork.PlayerList[i].UserId, Instantiate(m_inventorySO));
-            if (PhotonNetwork.PlayerList[i].UserId == PhotonNetwork.LocalPlayer.UserId)
+            var inventory = new PlayerInventory(userIds[i].ToString(), Instantiate(m_inventorySO));
+            if (userIds[i] == PhotonNetwork.LocalPlayer.ActorNumber)
             {
                 m_localPlayerInventory = inventory;
             }
@@ -86,6 +93,31 @@ public class GameManager : MonoBehaviour, IPunObservable
 
         OnInventoriesInitialized?.Invoke(m_localPlayerInventory, m_otherPlayerInventory);
     }
+
+    #region BET
+
+    public void AddTokenToBet(PlayerInventory playerInventory, string tokenId)
+    {
+        myPhotonView?.RPC("RPC_AddTokenToBet", RpcTarget.Others, playerInventory.UserId, tokenId);
+    }
+
+    [PunRPC]
+    private void RPC_AddTokenToBet(string userId, string tokenId)
+    {
+        OnAddTokenToBet?.Invoke(userId, tokenId);
+    }
+    public void RemoveTokenFromBet(PlayerInventory playerInventory, string tokenId)
+    {
+        myPhotonView?.RPC("RPC_RemoveTokenFromBet", RpcTarget.Others, playerInventory.UserId, tokenId);
+    }
+
+    [PunRPC]
+    private void RPC_RemoveTokenFromBet(string userId, string tokenId)
+    {
+        OnRemoveTokenFromBet?.Invoke(userId, tokenId);
+    }
+
+    #endregion
 
     [PunRPC]
     private void FlipChip(int chipIndex)
@@ -110,5 +142,10 @@ public class GameManager : MonoBehaviour, IPunObservable
     void IPunObservable.OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
         //We could send other player's mouse position in here
+    }
+
+    private PlayerInventory GetInventory(string userId)
+    {
+        return m_localPlayerInventory.UserId == userId ? m_localPlayerInventory : m_otherPlayerInventory;
     }
 }

@@ -39,13 +39,19 @@ public class UIToken : MonoBehaviour
         m_quantityText.text = "x" + qty;
     }
 
+    public void UpdateQuantity()
+    {
+        var qty = m_token.Quantity - m_betStacks * GameManager.S_BET_INCREMENTS;
+        UpdateQuantity(qty);
+    }
+
     public void OnAddBetClicked()
     {
         var currentBet = m_betStacks * GameManager.S_BET_INCREMENTS;
         if( m_token.Quantity - currentBet >= GameManager.S_BET_INCREMENTS)
         {
             m_betStacks++;
-            UpdateQuantity(m_token.Quantity - m_betStacks * GameManager.S_BET_INCREMENTS);
+            UpdateQuantity();
             m_uiTokenInventory.OnAddBetStacked(this);
         }
     }
@@ -55,8 +61,20 @@ public class UIToken : MonoBehaviour
         if(m_betStacks > 0)
         {
             m_betStacks--;
-            UpdateQuantity(m_token.Quantity - m_betStacks * GameManager.S_BET_INCREMENTS);
+            UpdateQuantity();
             m_uiTokenInventory.OnRemoveBetStacked(this);
         }
     }
+
+    public void UpdateAddBet()
+    {
+        m_betStacks++;
+        UpdateQuantity();
+    }
+    public void UpdateRemoveBet()
+    {
+        m_betStacks--;
+        UpdateQuantity();
+    }
+
 }

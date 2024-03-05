@@ -1,7 +1,16 @@
+Photon App Id : 5daa9bd9-432c-4e9c-9567-a9e1785fc4dc
+
 Everything happens in the ConnectScene. Ultimately it should do the connection in this scene then Load a scene on the MasterClient when all players are ready
 
 The NetworkController handles the connection. Once both players are connected, it tells the GameManager to start the game.
 
 The GameManager begin by telling the GridManager to generate the grid on MasterClient. Once it's done, it gets the indexes where there are green chips and sends it to the 
 other player via an RPC. The client can then begin generating its own grid with these infos
+
+GameManager handles all the RPCs. It's kind of the hub for any action we wanna take in the game
+
+TODO
+Turns
+Select tile to bet on
+BET
 

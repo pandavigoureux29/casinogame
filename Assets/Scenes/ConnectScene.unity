@@ -283,7 +283,7 @@ MonoBehaviour:
   m_tokenPrefab: {fileID: 3323179424209286236, guid: 6c2d15a661ac2e84e868300b99483289,
     type: 3}
   m_isLocal: 0
-  m_tokenBetStack: {fileID: 0}
+  m_tokenBetStack: {fileID: 1051846251}
 --- !u!114 &374405908
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -788,7 +788,7 @@ GameObject:
   - component: {fileID: 1051846250}
   - component: {fileID: 1051846251}
   m_Layer: 5
-  m_Name: BetUI
+  m_Name: TokensStack
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
