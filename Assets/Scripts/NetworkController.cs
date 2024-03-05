@@ -28,7 +28,6 @@ public class NetworkController : MonoBehaviourPunCallbacks
 	public override void OnJoinedRoom()
 	{
 		Debug.Log("Joined a room.");
-		PhotonNetwork.Instantiate(playerPrefab.name, Vector3.zero, Quaternion.identity);
 	}
 
     public override void OnPlayerEnteredRoom(Player newPlayer)
