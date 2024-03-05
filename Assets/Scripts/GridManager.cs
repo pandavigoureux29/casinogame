@@ -112,7 +112,7 @@ public class GridManager : MonoBehaviour
 
     public bool CheckChip(int index, ReversableChip.EColor color)
     {
-        if (index >= m_chips.Count)
+        if (index < 0 || index >= m_chips.Count)
             return false;
 
         var chip = m_chips[index];

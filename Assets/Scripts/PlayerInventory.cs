@@ -27,7 +27,7 @@ public class PlayerInventory
 
     public bool CanBetMore(string tokenId, int currentBet)
     {
-        return GetQuantity(tokenId) - currentBet >= GameManager.S_BET_INCREMENTS;
+        return GetQuantity(tokenId) - currentBet >= BetManager.S_BET_INCREMENTS;
     }
 
     public void UpdateQuantities(Dictionary<string, int> m_betTokensCount, bool win)
@@ -38,7 +38,7 @@ public class PlayerInventory
             if(token == null)
                 continue;
 
-            int earnings = tokenStackCount.Value * GameManager.S_BET_INCREMENTS;
+            int earnings = tokenStackCount.Value * BetManager.S_BET_INCREMENTS;
             if(!win)
                 earnings *= -1;
 

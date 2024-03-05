@@ -41,14 +41,14 @@ public class UIToken : MonoBehaviour
 
     public void UpdateQuantity()
     {
-        var qty = m_token.Quantity - m_betStacks * GameManager.S_BET_INCREMENTS;
+        var qty = m_token.Quantity - m_betStacks * BetManager.S_BET_INCREMENTS;
         UpdateQuantity(qty);
     }
 
     public void OnAddBetClicked()
     {
-        var currentBet = m_betStacks * GameManager.S_BET_INCREMENTS;
-        if( m_token.Quantity - currentBet >= GameManager.S_BET_INCREMENTS)
+        var currentBet = m_betStacks * BetManager.S_BET_INCREMENTS;
+        if( m_token.Quantity - currentBet >= BetManager.S_BET_INCREMENTS)
         {
             m_betStacks++;
             UpdateQuantity();
