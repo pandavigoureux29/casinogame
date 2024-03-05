@@ -7,6 +7,10 @@ public class GridManager : MonoBehaviour
 {
     [SerializeField]
     private ReversableChip m_chipPrefab;
+    [SerializeField]
+    private Transform m_container;
+    [SerializeField]
+    private GameObject m_selectorObject;
 
     [SerializeField]
     private int m_gridSize = 8;
@@ -38,7 +42,7 @@ public class GridManager : MonoBehaviour
         for (int i=0; i < m_gridSize * m_gridSize; i++)
         {
             //instantiate chip
-            var go = Instantiate(m_chipPrefab,transform);
+            var go = Instantiate(m_chipPrefab, m_container);
             ReversableChip chip = go.GetComponent<ReversableChip>();
             chip.Index = i;
 
@@ -93,9 +97,24 @@ public class GridManager : MonoBehaviour
         return null;
     }
 
+    public bool SelectChip(int index)
+    {
+        if(index >= m_chips.Count) 
+            return false;
+
+        var chip = m_chips[index];
+
+        m_selectorObject.SetActive(true);
+        m_selectorObject.transform.position = chip.transform.position;
+
+        return !chip.IsFlipped;
+    }
+
     public void FlipChip(int index)
     {
-        if(index < m_chips.Count)
+        m_selectorObject.SetActive(false);
+
+        if (index < m_chips.Count)
         {
             m_chips[index].Flip();
         }

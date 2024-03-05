@@ -27,6 +27,8 @@ public class GameManager : MonoBehaviour, IPunObservable
     public Action<string, string> OnAddTokenToBet;
     public Action<string, string> OnRemoveTokenFromBet;
 
+    private int m_currentSelectedChip = -1;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -42,14 +44,7 @@ public class GameManager : MonoBehaviour, IPunObservable
             StartGame();
         }
 
-        if (Input.GetMouseButtonDown(0))
-        {
-            var chip = m_gridManager.GetClickedChip();
-            if (chip != null)
-            {
-                FlipChip(chip.Index);
-            }
-        }
+        CheckSelectedChip();
     }
 
     public void StartGame()
@@ -119,20 +114,39 @@ public class GameManager : MonoBehaviour, IPunObservable
 
     #endregion
 
-    [PunRPC]
-    private void FlipChip(int chipIndex)
-    {
-        m_gridManager.FlipChip(chipIndex);
+    #region SELECT_CHIP
 
-        if (PhotonNetwork.IsMasterClient)
+    private void CheckSelectedChip()
+    {
+        if (Input.GetMouseButtonDown(0))
         {
-            myPhotonView?.RPC("FlipChip", RpcTarget.Others, chipIndex);
-        }
-        else
-        {
-            myPhotonView?.RPC("FlipChip", RpcTarget.MasterClient, chipIndex);
+            var chip = m_gridManager.GetClickedChip();
+            if (chip != null)
+            {
+                SelectChip(chip.Index);
+            }
         }
     }
+    
+    private void SelectChip(int chipIndex)
+    {
+        m_currentSelectedChip = chipIndex;
+        m_gridManager.SelectChip(chipIndex);
+        myPhotonView?.RPC("RPC_SelectChip", RpcTarget.Others, chipIndex);
+    }
+
+    [PunRPC]
+    private void RPC_SelectChip(int chipIndex)
+    {
+        bool success = m_gridManager.SelectChip(chipIndex);
+        //this will check on MasterClient that we're not trying to select an already flipped chip
+        if (success)
+        {
+            m_currentSelectedChip = chipIndex;
+        }
+    }
+
+    #endregion
 
     public void ConfirmBet(Dictionary<string, int> tokens)
     {

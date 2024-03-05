@@ -43,6 +43,8 @@ MonoBehaviour:
   - FlipChip
   - RPC_AddTokenToBet
   - RPC_RemoveTokenFromBet
+  - SelectChip
+  - RPC_SelectChip
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1
