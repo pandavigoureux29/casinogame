@@ -45,4 +45,29 @@ public class PlayerInventory
             token.Quantity += earnings;
         }
     }
+
+    public void GetTokensForNetwork(out List<string> keys, out List<int> values)
+    {
+        keys = new List<string>();
+        values = new List<int>();
+
+        foreach (var token in m_inventory.tokens)
+        {
+            keys.Add(token.Id);
+            values.Add(token.Quantity);
+        }
+    }
+
+    public void UpdateTokensFromNetwork(string[] keys, int[] values)
+    {
+        for(int i = 0; i < keys.Length; i++)
+        {
+            var tokenkey = keys[i];
+            var token = m_inventory.tokens.FirstOrDefault(x => x.Id == tokenkey);
+            if(token != null)
+            {
+                token.Quantity = values[i];
+            }
+        }
+    }
 }

@@ -28,6 +28,7 @@ public class UITokenInventory : MonoBehaviour
         m_gameManager.BetManager.OnAddTokenToBet += OnAddBetEvent;
         m_gameManager.BetManager.OnRemoveTokenFromBet += OnRemoveBetEvent;
         m_gameManager.BetManager.OnBetConfirmed += OnBetConfirmed;
+        m_gameManager.OnInventoryUpdated += OnInventoryUpdated;
     }
 
     private void OnDestroy()
@@ -37,6 +38,7 @@ public class UITokenInventory : MonoBehaviour
             m_gameManager.BetManager.OnAddTokenToBet -= OnAddBetEvent;
             m_gameManager.BetManager.OnRemoveTokenFromBet -= OnRemoveBetEvent;
             m_gameManager.BetManager.OnBetConfirmed -= OnBetConfirmed;
+            m_gameManager.OnInventoryUpdated -= OnInventoryUpdated;
         }
     }
 
@@ -133,9 +135,17 @@ public class UITokenInventory : MonoBehaviour
     private void OnBetConfirmed(bool isBetWon)
     {
         m_tokenBetStack.ClearStack();
-        foreach(var uiToken in m_uiTokens)
+    }
+
+    public void OnInventoryUpdated(PlayerInventory inventory)
+    {
+        if(inventory == m_inventory)
         {
-            uiToken.UpdateQuantity();
+            foreach (var uiToken in m_uiTokens)
+            {
+                uiToken.UpdateQuantity();
+            }
+
         }
     }
 

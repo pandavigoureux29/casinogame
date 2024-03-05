@@ -4,10 +4,12 @@ Everything happens in the ConnectScene. Ultimately it should do the connection i
 
 The NetworkController handles the connection. Once both players are connected, it tells the GameManager to start the game.
 
-The GameManager begin by telling the GridManager to generate the grid on MasterClient. Once it's done, it gets the indexes where there are green chips and sends it to the 
+The GameManager begins by telling the GridManager to generate the grid on MasterClient. Once it's done, it gets the indexes where there are green chips and sends it to the 
 other player via an RPC. The client can then begin generating its own grid with these infos
 
-GameManager handles all the RPCs. It's kind of the hub for any action we wanna take in the game. This code could be split but for the sake of this exercise I decided to centralize the RPCs.
+GameManager handles the game flow RPCs. It's kind of the hub for any action we wanna take in the game.
+BetManager handles the calls related to betting.
+Both of them need each other so it would be more interesting to use dependency injection, but I didnt have the time to set it up
 
 The GameManager on the MasterClient ensures the players cannot bet more than they have so the Client cannot cheat by sending corrupt data.
 

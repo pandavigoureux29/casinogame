@@ -94,13 +94,11 @@ public class BetManager : MonoBehaviour, IPunObservable
         {
             bool isBetWon = m_gameManager.CheckChip(ReversableChip.EColor.GREEN);
 
-            m_gameManager.ConfirmBet();
+            m_gameManager.ConfirmBet(m_betTokensCount, isBetWon);
 
             //notify client that the bet is done
             myPhotonView?.RPC("RPC_ConfirmBet", RpcTarget.Others, isBetWon, m_gameManager.CurrentPlayer.ActorNumber);
 
-
-            m_gameManager.GetCurrentInventory().UpdateQuantities(m_betTokensCount, isBetWon);
             OnBetConfirmed?.Invoke(isBetWon);
 
             m_betTokensCount.Clear();
@@ -124,7 +122,7 @@ public class BetManager : MonoBehaviour, IPunObservable
     [PunRPC]
     public void RPC_ConfirmBet(bool isBetWon, int turnPlayerId)
     {
-        m_gameManager.ConfirmBet(turnPlayerId);
+        m_gameManager.ConfirmBet(null, isBetWon, turnPlayerId);
         OnBetConfirmed?.Invoke(isBetWon);
     }
 

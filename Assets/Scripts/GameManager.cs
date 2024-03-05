@@ -7,6 +7,7 @@ using Photon.Realtime;
 using System;
 using Unity.VisualScripting.Antlr3.Runtime;
 using Newtonsoft.Json.Linq;
+using UnityEngine.Rendering.LookDev;
 
 public class GameManager : MonoBehaviour, IPunObservable
 {
@@ -30,6 +31,7 @@ public class GameManager : MonoBehaviour, IPunObservable
 
     public Action<PlayerInventory, PlayerInventory> OnInventoriesInitialized;
     public Action<string> OnTurnChanged;
+    public Action<PlayerInventory> OnInventoryUpdated;
 
     private int m_currentSelectedChip = -1;
 
@@ -138,16 +140,48 @@ public class GameManager : MonoBehaviour, IPunObservable
 
     #endregion
 
-    public void ConfirmBet(int turnPlayerId = -1)
+    public void ConfirmBet(Dictionary<string, int> betTokensCount, bool win, int turnPlayerId = -1)
     {
         m_gridManager.FlipChip(m_currentSelectedChip);
-        ChangeTurn();
-        OnTurnChanged?.Invoke(m_currentPlayer.ActorNumber.ToString());
 
-        if (!PhotonNetwork.IsMasterClient)
+        if (PhotonNetwork.IsMasterClient)
         {
+            var inventory = GetCurrentInventory();
+            //apply the bet to inventory and update client's
+            inventory.UpdateQuantities(betTokensCount,win);
+            SendCurrentInventoryUpdate();
+            OnInventoryUpdated?.Invoke(inventory);
+        }
+        else 
+        { 
+            //set the current player on client
             m_currentPlayer = PhotonNetwork.PlayerList.First(x => x.ActorNumber == turnPlayerId);
         }
+
+        ChangeTurn();
+        OnTurnChanged?.Invoke(m_currentPlayer.ActorNumber.ToString());
+    }
+
+    /// <summary>
+    /// Send the current inventory on the server to the client so it can update
+    /// </summary>
+    public void SendCurrentInventoryUpdate()
+    {
+        if (PhotonNetwork.IsMasterClient)
+        {
+            List<string> keys;
+            List<int> values;
+            GetCurrentInventory().GetTokensForNetwork(out keys, out values);
+            myPhotonView?.RPC("RPC_UpdateInventory", RpcTarget.Others, CurrentPlayer.ActorNumber.ToString(), keys.ToArray(), values.ToArray());
+        }
+    }
+
+    [PunRPC]
+    public void RPC_UpdateInventory(string userId, string[] keys, int[] values)
+    {
+        var inventory = GetInventory(userId);
+        inventory.UpdateTokensFromNetwork(keys,values);
+        OnInventoryUpdated?.Invoke(inventory);
     }
 
     private void ChangeTurn()
