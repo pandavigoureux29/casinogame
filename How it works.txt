@@ -16,12 +16,21 @@ The GameManager on the MasterClient ensures the players cannot bet more than the
 Flow:
 1. Player adds/remove Tokens that they wanna be (AddTokenToBet/RemoveTokenFromBet in GameManager)
 2. They select a chip to bet on (SelectChip in GameManager)
+3. Select the color you wanna bet on
+4. Click on BET !! and set if you won
 
 Notes: 
 - Somehow, the UserId of players was null for the client on both Master and client. That's why I'm using ActorNumber instead which seems to be working.
 
 TODO
-BET
-Compute earnings
 Check turn before betting ( UI and MasterClient )
+Reset when losing
+Reset all when all tiles are flipped
+check bet chip has been selected
+cannot select chip if not your turn
+
+enlever le debug qui spawn le grid
+
+optional :
+Enlever des trucs de UIInventory ( bet button etc... )
 

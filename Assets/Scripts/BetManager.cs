@@ -20,6 +20,7 @@ public class BetManager : MonoBehaviour, IPunObservable
 
     private PhotonView myPhotonView;
 
+    private ReversableChip.EColor m_currentColor;
     private Dictionary<string, int> m_betTokensCount = new Dictionary<string, int>();
 
     void Start()
@@ -95,21 +96,30 @@ public class BetManager : MonoBehaviour, IPunObservable
 
     #endregion
 
+    #region BET_COLOR
+
+    public void ChangeBetColor(ReversableChip.EColor eColor)
+    {
+        m_currentColor = eColor;
+    }
+
+    #endregion
+
 
     #region ConfirmBet
 
     public void OnDeclareBet()
     {
-        DeclareBet();
+        DeclareBet(m_currentColor);
     }
 
     //on master : confirm the bet and move on to next turn
     //on client : ask the master for confirmation
-    private void DeclareBet()
+    private void DeclareBet(ReversableChip.EColor color)
     {
         if (PhotonNetwork.IsMasterClient)
         {
-            bool isBetWon = m_gameManager.CheckChip(ReversableChip.EColor.GREEN);
+            bool isBetWon = m_gameManager.CheckChip(color);
 
             m_gameManager.ConfirmBet(m_betTokensCount, isBetWon);
 
@@ -124,15 +134,16 @@ public class BetManager : MonoBehaviour, IPunObservable
         else
         {
             //notify master that the bet is set and confirmed
-            myPhotonView?.RPC("RPC_DeclareBet", RpcTarget.Others);
+            myPhotonView?.RPC("RPC_DeclareBet", RpcTarget.Others, (int)m_currentColor);
         }
     }
 
     //From client to master to declare the bet
     [PunRPC]
-    private void RPC_DeclareBet()
+    private void RPC_DeclareBet(int colorInt)
     {
-        DeclareBet();
+        ReversableChip.EColor sentColor = (ReversableChip.EColor)colorInt;
+        DeclareBet(sentColor);
     }
 
     //From master to client to confirm the bet and update values
