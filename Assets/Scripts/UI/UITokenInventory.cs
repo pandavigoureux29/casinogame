@@ -1,3 +1,4 @@
+using Newtonsoft.Json.Bson;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -33,6 +34,7 @@ public class UITokenInventory : MonoBehaviour
         m_gameManager.BetManager.OnRemoveTokenFromBet += OnRemoveBetEvent;
         m_gameManager.BetManager.OnBetConfirmed += OnBetConfirmed;
         m_gameManager.OnInventoryUpdated += OnInventoryUpdated;
+        m_gameManager.OnChipSelected += OnChipSelected;
         m_gameManager.OnTurnChanged += OnTurnChanged;
     }
 
@@ -44,6 +46,7 @@ public class UITokenInventory : MonoBehaviour
             m_gameManager.BetManager.OnRemoveTokenFromBet -= OnRemoveBetEvent;
             m_gameManager.BetManager.OnBetConfirmed -= OnBetConfirmed;
             m_gameManager.OnInventoryUpdated -= OnInventoryUpdated;
+            m_gameManager.OnChipSelected -= OnChipSelected;
             m_gameManager.OnTurnChanged -= OnTurnChanged;
         }
     }
@@ -84,6 +87,8 @@ public class UITokenInventory : MonoBehaviour
         //send to network
         if(sendEvent)
             m_gameManager.BetManager.AddTokenToBet(m_inventory, token.Id);
+
+        UpdateBetButton();
     }
 
     public void OnRemoveBetStacked(UIToken token, bool sendEvent = true)
@@ -105,6 +110,8 @@ public class UITokenInventory : MonoBehaviour
         //send to network
         if (sendEvent)
             m_gameManager.BetManager.RemoveTokenFromBet(m_inventory, token.Id);
+
+        UpdateBetButton();
     }
 
     //from rpc
@@ -142,6 +149,7 @@ public class UITokenInventory : MonoBehaviour
     {
         m_betTokensCount.Clear();
         m_tokenBetStack.ClearStack();
+        UpdateBetButton();
     }
 
     public void OnInventoryUpdated(PlayerInventory inventory)
@@ -153,7 +161,6 @@ public class UITokenInventory : MonoBehaviour
                 uiToken.ClearBetStacks();
                 uiToken.UpdateQuantity();
             }
-
         }
     }
 
@@ -166,10 +173,26 @@ public class UITokenInventory : MonoBehaviour
             uiToken.Toggle(toggle);
         }
 
-        if(m_betButton != null)
+        UpdateBetButton();
+    }
+
+    private void OnChipSelected(int chipIndex)
+    {
+        UpdateBetButton();
+    }
+
+    private void UpdateBetButton()
+    {
+        if(m_betButton == null)
         {
-            m_betButton.interactable = toggle;
+            return;
         }
+
+        bool toggleButton = m_gameManager.IsLocalPlayerTurn();
+        toggleButton &= m_gameManager.IsChipSelected;
+        toggleButton &= m_betTokensCount.Count > 0;
+
+        m_betButton.interactable = toggleButton;
     }
 
 }

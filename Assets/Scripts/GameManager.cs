@@ -33,6 +33,7 @@ public class GameManager : MonoBehaviour, IPunObservable
     public Action<PlayerInventory, PlayerInventory> OnInventoriesInitialized;
     public Action<string> OnTurnChanged;
     public Action<PlayerInventory> OnInventoryUpdated;
+    public Action<int> OnChipSelected;
 
     private int m_currentSelectedChip = -1;
     public bool IsChipSelected => m_currentSelectedChip >= 0;
@@ -122,6 +123,7 @@ public class GameManager : MonoBehaviour, IPunObservable
         m_currentSelectedChip = chipIndex;
         m_gridManager.SelectChip(chipIndex);
         myPhotonView?.RPC("RPC_SelectChip", RpcTarget.Others, chipIndex);
+        OnChipSelected?.Invoke(chipIndex);
     }
 
     [PunRPC]
@@ -132,6 +134,7 @@ public class GameManager : MonoBehaviour, IPunObservable
         if (success)
         {
             m_currentSelectedChip = chipIndex;
+            OnChipSelected?.Invoke(chipIndex);
         }
     }
 
@@ -207,6 +210,11 @@ public class GameManager : MonoBehaviour, IPunObservable
     public PlayerInventory GetCurrentInventory()
     {
         return m_localPlayerInventory.UserId == m_currentPlayer.ActorNumber.ToString() ? m_localPlayerInventory : m_otherPlayerInventory;
+    }
+
+    public bool IsLocalPlayerTurn()
+    {
+        return m_currentPlayer == PhotonNetwork.LocalPlayer;
     }
 
     void IPunObservable.OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
