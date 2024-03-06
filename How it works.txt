@@ -27,7 +27,7 @@ Check turn before betting ( UI and MasterClient )
 Reset when losing
 Reset all when all tiles are flipped
 check bet chip has been selected
-cannot select chip if not your turn
+check there is at least one token bet on (UI deactivate button)
 
 enlever le debug qui spawn le grid
 

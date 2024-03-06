@@ -110,7 +110,10 @@ public class BetManager : MonoBehaviour, IPunObservable
 
     public void OnDeclareBet()
     {
-        DeclareBet(m_currentColor);
+        if (m_gameManager.IsChipSelected)
+        {
+            DeclareBet(m_currentColor);
+        }
     }
 
     //on master : confirm the bet and move on to next turn
@@ -119,6 +122,11 @@ public class BetManager : MonoBehaviour, IPunObservable
     {
         if (PhotonNetwork.IsMasterClient)
         {
+            if (!IsBetValid())
+            {
+                Debug.LogError("There's no token bet");
+                return;
+            }
             bool isBetWon = m_gameManager.CheckChip(color);
 
             m_gameManager.ConfirmBet(m_betTokensCount, isBetWon);
@@ -155,6 +163,16 @@ public class BetManager : MonoBehaviour, IPunObservable
     }
 
     #endregion
+
+    private bool IsBetValid()
+    {
+        foreach ( var token in m_betTokensCount)
+        {
+            if (token.Value > 0)
+                return true;
+        }
+        return false;
+    }
 
     void IPunObservable.OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {

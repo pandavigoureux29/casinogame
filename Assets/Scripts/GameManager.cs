@@ -35,6 +35,7 @@ public class GameManager : MonoBehaviour, IPunObservable
     public Action<PlayerInventory> OnInventoryUpdated;
 
     private int m_currentSelectedChip = -1;
+    public bool IsChipSelected => m_currentSelectedChip >= 0;
 
     // Start is called before the first frame update
     void Start()
@@ -160,6 +161,7 @@ public class GameManager : MonoBehaviour, IPunObservable
             //set the current player on client
             m_currentPlayer = PhotonNetwork.PlayerList.First(x => x.ActorNumber == turnPlayerId);
         }
+        m_currentSelectedChip = -1;
         OnTurnChanged?.Invoke(m_currentPlayer.ActorNumber.ToString());
     }
 

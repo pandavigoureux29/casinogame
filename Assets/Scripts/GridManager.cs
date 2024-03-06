@@ -92,7 +92,8 @@ public class GridManager : MonoBehaviour
         {
             var go = hit.collider.gameObject;
             var chip = go.GetComponent<ReversableChip>();
-            return chip;
+            if(!chip.IsFlipped)
+                return chip;
         }
         return null;
     }
