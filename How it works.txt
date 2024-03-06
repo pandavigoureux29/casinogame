@@ -26,9 +26,6 @@ Notes:
 - Somehow, the property UserId was null for some players. That's why I'm using ActorNumber instead which seems to be working, since I didn't want to lose time investigating.
 (that was not the point of the exercise imo)
 
-TODO
-resize canvas
-
 optional :
 Enlever des trucs de UIInventory ( bet button etc... )
 

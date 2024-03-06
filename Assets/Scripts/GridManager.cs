@@ -17,7 +17,7 @@ public class GridManager : MonoBehaviour
     private int m_gridSize = 8;
 
     [SerializeField]
-    private float m_chipSpacing = 2;
+    private float m_chipCellLength = 2;
 
     [SerializeField]
     private float m_chipLength = 1;
@@ -46,7 +46,7 @@ public class GridManager : MonoBehaviour
         var currentGreenIndex = 0;
         Vector3 chipPosition = Vector3.zero;
 
-        float halfSize = (m_gridSize * 0.5f) * (m_chipSpacing *.5f) + (m_gridSize * 0.5f) * m_chipLength;
+        float halfSize = (m_gridSize * 0.5f) * (m_chipCellLength * .5f) + (m_gridSize * 0.5f) * m_chipLength;
 
         for (int i=0; i < m_gridSize * m_gridSize; i++)
         {
@@ -70,8 +70,8 @@ public class GridManager : MonoBehaviour
             int row = i / m_gridSize;
             int column = i % m_gridSize;
 
-            chipPosition.x = -halfSize + column * m_chipSpacing;
-            chipPosition.z = -halfSize + row * m_chipSpacing;
+            chipPosition.x = -halfSize + (m_chipCellLength * 0.5f) + (column * m_chipCellLength);
+            chipPosition.z = -halfSize + (m_chipCellLength *0.5f) + (row * m_chipCellLength);
             go.transform.localPosition = chipPosition;
 
             m_chips.Add( chip );
