@@ -106,7 +106,7 @@ public class GameManager : MonoBehaviour, IPunObservable
 
     private void CheckSelectedChip()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (m_currentPlayer == PhotonNetwork.LocalPlayer && Input.GetMouseButtonDown(0))
         {
             var chip = m_gridManager.GetClickedChip();
             if (chip != null)
