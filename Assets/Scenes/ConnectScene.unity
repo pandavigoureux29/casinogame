@@ -2388,8 +2388,9 @@ MonoBehaviour:
     type: 3}
   m_container: {fileID: 1993817723}
   m_selectorObject: {fileID: 147726981}
-  m_gridSize: 2
+  m_gridSize: 8
   m_chipSpacing: 2
+  m_chipLength: 1
 --- !u!4 &2082482209
 Transform:
   m_ObjectHideFlags: 0
@@ -2398,7 +2399,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2082482207}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -6, y: 0, z: -7}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:

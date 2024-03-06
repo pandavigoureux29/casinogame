@@ -19,6 +19,9 @@ public class GridManager : MonoBehaviour
     [SerializeField]
     private float m_chipSpacing = 2;
 
+    [SerializeField]
+    private float m_chipLength = 1;
+
     private List<ReversableChip> m_chips;
 
     private List<int> m_greenIndexes;
@@ -43,6 +46,8 @@ public class GridManager : MonoBehaviour
         var currentGreenIndex = 0;
         Vector3 chipPosition = Vector3.zero;
 
+        float halfSize = (m_gridSize * 0.5f) * (m_chipSpacing *.5f) + (m_gridSize * 0.5f) * m_chipLength;
+
         for (int i=0; i < m_gridSize * m_gridSize; i++)
         {
             //instantiate chip
@@ -65,8 +70,8 @@ public class GridManager : MonoBehaviour
             int row = i / m_gridSize;
             int column = i % m_gridSize;
 
-            chipPosition.x = column * m_chipSpacing;
-            chipPosition.z = row * m_chipSpacing;
+            chipPosition.x = -halfSize + column * m_chipSpacing;
+            chipPosition.z = -halfSize + row * m_chipSpacing;
             go.transform.localPosition = chipPosition;
 
             m_chips.Add( chip );
