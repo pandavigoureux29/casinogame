@@ -2032,7 +2032,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_inventorySO
       value: 
-      objectReference: {fileID: 11400000, guid: 4daeb3306929c0949911ea814a2b909e,
+      objectReference: {fileID: 11400000, guid: 3babc2392c9dbea4ab9cf7a3e116834f,
         type: 2}
     - target: {fileID: 827048021340141961, guid: bfe62ee198db69d45ac1d8aa2603911b,
         type: 3}

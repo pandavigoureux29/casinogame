@@ -154,6 +154,13 @@ public class GameManager : MonoBehaviour, IPunObservable
             var inventory = GetCurrentInventory();
             //apply the bet to inventory and update client's
             inventory.UpdateQuantities(betTokensCount,win);
+
+            //reset condition
+            if(inventory.TotalTokensCount <= 0)
+            {
+                inventory.Reset(m_inventorySO);
+            }
+
             SendCurrentInventoryUpdate();
             OnInventoryUpdated?.Invoke(inventory);
 
@@ -169,7 +176,7 @@ public class GameManager : MonoBehaviour, IPunObservable
     }
 
     /// <summary>
-    /// Send the current inventory on the server to the client so it can update
+    /// Send the current inventory from the server to the client so it can update
     /// </summary>
     public void SendCurrentInventoryUpdate()
     {

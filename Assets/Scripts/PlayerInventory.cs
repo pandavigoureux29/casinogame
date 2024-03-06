@@ -11,10 +11,14 @@ public class PlayerInventory
     private PlayerInventorySO m_inventory;
     public PlayerInventorySO Inventory => m_inventory;
 
+    private int m_totalTokensCount = 0;
+    public int TotalTokensCount => m_totalTokensCount;
+
     public PlayerInventory(string userId, PlayerInventorySO playerInventorySO)
     {
         m_userId = userId;
         m_inventory = playerInventorySO;
+        m_totalTokensCount = playerInventorySO.tokens.Sum(x=> x.Quantity);
     }
 
     public int GetQuantity(string tokenId)
@@ -43,6 +47,7 @@ public class PlayerInventory
                 earnings *= -1;
 
             token.Quantity += earnings;
+            m_totalTokensCount += earnings;
         }
     }
 
@@ -66,8 +71,21 @@ public class PlayerInventory
             var token = m_inventory.tokens.FirstOrDefault(x => x.Id == tokenkey);
             if(token != null)
             {
+                int lastvalue = token.Quantity;
                 token.Quantity = values[i];
+
+                m_totalTokensCount += token.Quantity - lastvalue;
             }
+        }
+    }
+
+    public void Reset(PlayerInventorySO playerInventorySO)
+    {
+        m_totalTokensCount = 0;
+        for(int i=0; i < playerInventorySO.tokens.Count; i++)
+        {
+            m_inventory.tokens[i].Quantity = playerInventorySO.tokens[i].Quantity;
+            m_totalTokensCount += m_inventory.tokens[i].Quantity;
         }
     }
 }
