@@ -48,6 +48,7 @@ MonoBehaviour:
   - RPC_ConfirmBet
   - RPC_DeclareBet
   - RPC_UpdateInventory
+  - RPC_ResetGrid
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1

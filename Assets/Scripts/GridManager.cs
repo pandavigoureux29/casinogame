@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 public class GridManager : MonoBehaviour
 {
@@ -23,7 +24,10 @@ public class GridManager : MonoBehaviour
     private List<int> m_greenIndexes;
     public List<int> GreenIndexes => m_greenIndexes;
 
-    public void InstantiateGrid(List<int> greenIndexes = null)
+    private int m_totalFlippedChipCount = 0;
+    public bool IsEverythingFlipped => m_totalFlippedChipCount >= m_chips.Count;
+
+    public void InstantiateGrid(int[] greenIndexes = null)
     {
         if(greenIndexes == null)
         {
@@ -67,6 +71,36 @@ public class GridManager : MonoBehaviour
 
             m_chips.Add( chip );
         }
+    }
+
+    public void ResetGrid(int[] greenIndexes = null)
+    {
+        if(greenIndexes == null)
+        {
+            GenerateGrid();
+        }
+        else
+        {
+            m_greenIndexes = greenIndexes.ToList();
+        }
+
+        var currentGreenIndex = 0;
+        for (int i=0; i < m_chips.Count; i++)
+        {
+            var chip = m_chips[i];
+            chip.Unflip();
+            if(currentGreenIndex < m_greenIndexes.Count && i == m_greenIndexes[currentGreenIndex])
+            {
+                currentGreenIndex++;
+                chip.SetColor(ReversableChip.EColor.GREEN);
+            }
+            else
+            {
+                chip.SetColor(ReversableChip.EColor.RED);
+            }        
+        }
+
+        m_totalFlippedChipCount = 0;
     }
 
     private void GenerateGrid()
@@ -125,9 +159,15 @@ public class GridManager : MonoBehaviour
     {
         m_selectorObject.SetActive(false);
 
+        if(index < 0)
+        {
+            Debug.LogError("Flip chip not selected");
+        }
+
         if (index < m_chips.Count)
         {
             m_chips[index].Flip();
+            m_totalFlippedChipCount++;
         }
     }
 }

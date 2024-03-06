@@ -80,7 +80,7 @@ public class GameManager : MonoBehaviour, IPunObservable
     public void RPC_StartGame(int[] greenIndexes, int[] userIds, int turnPlayerId)
     {
         InitializePlayers(userIds);
-        m_gridManager.InstantiateGrid(greenIndexes.ToList());
+        m_gridManager.InstantiateGrid(greenIndexes);
 
         m_currentPlayer = PhotonNetwork.PlayerList.First(x=>x.ActorNumber==turnPlayerId);
         OnTurnChanged?.Invoke(m_currentPlayer.ActorNumber.ToString());
@@ -164,6 +164,11 @@ public class GameManager : MonoBehaviour, IPunObservable
             SendCurrentInventoryUpdate();
             OnInventoryUpdated?.Invoke(inventory);
 
+            if (m_gridManager.IsEverythingFlipped)
+            {
+                ResetGrid_Master();
+            }
+
             ChangeTurn();
         }
         else 
@@ -208,6 +213,24 @@ public class GameManager : MonoBehaviour, IPunObservable
             m_currentPlayer = PhotonNetwork.LocalPlayer;
         }
     }
+
+    #region RESET_GRID
+
+    private void ResetGrid_Master()
+    {
+        m_gridManager.ResetGrid();
+
+        myPhotonView?.RPC("RPC_ResetGrid", RpcTarget.Others,
+                m_gridManager.GreenIndexes.ToArray());
+    }
+
+    [PunRPC]
+    private void RPC_ResetGrid(int[] greenIndexes)
+    {
+        m_gridManager.ResetGrid(greenIndexes);
+    }
+
+    #endregion
 
     public PlayerInventory GetInventory(string userId)
     {

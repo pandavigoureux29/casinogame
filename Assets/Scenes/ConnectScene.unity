@@ -2388,7 +2388,7 @@ MonoBehaviour:
     type: 3}
   m_container: {fileID: 1993817723}
   m_selectorObject: {fileID: 147726981}
-  m_gridSize: 8
+  m_gridSize: 2
   m_chipSpacing: 2
 --- !u!4 &2082482209
 Transform:

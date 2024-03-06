@@ -32,12 +32,6 @@ public class ReversableChip : MonoBehaviour
     private bool m_isFlipped;
     public bool IsFlipped => m_isFlipped;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
     public void SetColor(EColor color)
     {
         m_color = color;
@@ -55,5 +49,11 @@ public class ReversableChip : MonoBehaviour
     {
         m_isFlipped = true;
         m_animator.SetTrigger("Flip");
+    }
+
+    public void Unflip()
+    {
+        m_isFlipped = false;
+        m_animator.SetTrigger("Unflip");
     }
 }

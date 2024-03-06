@@ -19,14 +19,16 @@ Flow:
 3. Select the color you wanna bet on (ChangeBetColor in BetManager)
 4. Click on BET !! and set if you won (DeclareBet in BetManager)
 
+When all chips on the board have been flipped, the colors are regenerated on MasterClient and we unlfip every chip
+Player that has no token left gets their inventory refilled with initial values.
+
 Notes: 
-- Somehow, some UserId of players was null for the client on both Master and client. That's why I'm using ActorNumber instead which seems to be working.
+- Somehow, the property UserId was null for some players. That's why I'm using ActorNumber instead which seems to be working, since I didn't want to lose time investigating.
+(that was not the point of the exercise imo)
 
 TODO
-Reset when losing
-Reset all when all tiles are flipped
-
-enlever le debug qui spawn le grid
+resize canvas
+grid tout le temps centrée
 
 optional :
 Enlever des trucs de UIInventory ( bet button etc... )
