@@ -28,7 +28,6 @@ Notes:
 
 TODO
 resize canvas
-grid tout le temps centrée
 
 optional :
 Enlever des trucs de UIInventory ( bet button etc... )
