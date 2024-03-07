@@ -17,9 +17,6 @@ public class UITokenInventory : MonoBehaviour
     private bool m_isLocal;
 
     [SerializeField]
-    private UITokenBetStack m_tokenBetStack;
-
-    [SerializeField]
     private Button m_betButton;
 
     private PlayerInventory m_inventory;
@@ -73,11 +70,6 @@ public class UITokenInventory : MonoBehaviour
         }
         m_betTokensCount[token.Id]++;
 
-        if(m_tokenBetStack != null)
-        {
-            m_tokenBetStack.AddToken(token);
-        }
-
         //send to network
         if(sendEvent)
             m_gameManager.BetManager.AddChipsToBet(m_inventory, token.Id);
@@ -93,11 +85,6 @@ public class UITokenInventory : MonoBehaviour
             if (m_betTokensCount[token.Id] == 0)
             {
                 m_betTokensCount.Remove(token.Id);
-            }
-
-            if (m_tokenBetStack != null)
-            {
-                m_tokenBetStack.RemoveToken(token);
             }
         }
 
@@ -125,7 +112,6 @@ public class UITokenInventory : MonoBehaviour
     private void OnBetConfirmed(bool isBetWon)
     {
         m_betTokensCount.Clear();
-        m_tokenBetStack.ClearStack();
         UpdateBetButton();
     }
 

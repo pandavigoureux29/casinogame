@@ -101,22 +101,12 @@ public class GameManager : MonoBehaviour, IPunObservable
                 inventory.Reset(m_inventorySO);
             }
 
-            SendCurrentInventoryUpdate(userId);
-            OnInventoryUpdated?.Invoke(inventory);        }
-    }
-
-    /// <summary>
-    /// Send the current inventory from the server to the client so it can update
-    /// </summary>
-    public void SendCurrentInventoryUpdate(string userId)
-    {
-        if (PhotonNetwork.IsMasterClient)
-        {
             List<string> keys;
             List<int> values;
             GetInventory(userId).GetTokensForNetwork(out keys, out values);
             myPhotonView?.RPC("RPC_UpdateInventory", RpcTarget.Others, userId, keys.ToArray(), values.ToArray());
-        }
+
+            OnInventoryUpdated?.Invoke(inventory);        }
     }
 
     [PunRPC]

@@ -28,6 +28,7 @@ public class ChipStacksHubManager : MonoBehaviour
         m_gameManager.OnInventoriesInitialized += OnInventoriesInitialized;
         m_gameManager.OnInventoryUpdated += OnInventoryUpdated;
         m_gameManager.BetManager.OnBetQuantityChanged += OnBetQuantityChanged;
+        m_gameManager.BetManager.OnBetConfirmed += OnBetConfirmed;
     }
 
     private void OnDestroy()
@@ -39,6 +40,7 @@ public class ChipStacksHubManager : MonoBehaviour
             if(m_gameManager.BetManager != null)
             {
                 m_gameManager.BetManager.OnBetQuantityChanged -= OnBetQuantityChanged;
+                m_gameManager.BetManager.OnBetConfirmed -= OnBetConfirmed;
             }
         }
     }
@@ -78,5 +80,13 @@ public class ChipStacksHubManager : MonoBehaviour
 
         m_betStacksMap[userId].RefreshChips(chipData, totalBetChipsCount);
         m_inventoryStacksMap[userId].RefreshChips(chipData, currentQuantity - totalBetChipsCount);
+    }
+
+    private void OnBetConfirmed(bool win)
+    {
+        foreach(var betStack in m_betStacksMap.Values)
+        {
+            betStack.Clear();
+        }
     }
 }

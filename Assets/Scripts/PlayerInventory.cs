@@ -11,22 +11,22 @@ public class PlayerInventory
     private PlayerInventorySO m_inventory;
     public PlayerInventorySO Inventory => m_inventory;
 
-    private int m_totalTokensCount = 0;
-    public int TotalTokensCount => m_totalTokensCount;
+    private int m_totalChipsCount = 0;
+    public int TotalTokensCount => m_totalChipsCount;
 
     public PlayerInventory(string userId, PlayerInventorySO playerInventorySO)
     {
         m_userId = userId;
         m_inventory = playerInventorySO;
-        m_totalTokensCount = playerInventorySO.Chips.Sum(x=> x.Quantity);
+        m_totalChipsCount = playerInventorySO.Chips.Sum(x=> x.Quantity);
     }
 
     public int GetQuantity(string chipId)
     {
-        var token = m_inventory.Chips.FirstOrDefault(x => x.Id == chipId);
-        if (token == null)
+        var chip = m_inventory.Chips.FirstOrDefault(x => x.Id == chipId);
+        if (chip == null)
             return 0;
-        return token.Quantity;
+        return chip.Quantity;
     }
 
     public bool CanBetMore(string chipId, int currentBet)
@@ -34,20 +34,20 @@ public class PlayerInventory
         return GetQuantity(chipId) - currentBet >= BetManager.S_BET_INCREMENTS;
     }
 
-    public void UpdateQuantities(Dictionary<string, int> m_betTokensCount, bool win)
+    public void UpdateQuantities(Dictionary<string, int> betChipIncrementsCount, bool win)
     {
-        foreach (var tokenStackCount in m_betTokensCount)
+        foreach (var chipIncrementsCount in betChipIncrementsCount)
         {
-            var token = m_inventory.Chips.FirstOrDefault(x=>x.Id == tokenStackCount.Key);
-            if(token == null)
+            var chip = m_inventory.Chips.FirstOrDefault(x=>x.Id == chipIncrementsCount.Key);
+            if(chip == null)
                 continue;
 
-            int earnings = tokenStackCount.Value * BetManager.S_BET_INCREMENTS;
+            int earnings = chipIncrementsCount.Value * BetManager.S_BET_INCREMENTS;
             if(!win)
                 earnings *= -1;
 
-            token.Quantity += earnings;
-            m_totalTokensCount += earnings;
+            chip.Quantity += earnings;
+            m_totalChipsCount += earnings;
         }
     }
 
@@ -67,25 +67,25 @@ public class PlayerInventory
     {
         for(int i = 0; i < keys.Length; i++)
         {
-            var tokenkey = keys[i];
-            var token = m_inventory.Chips.FirstOrDefault(x => x.Id == tokenkey);
-            if(token != null)
+            var chipKey = keys[i];
+            var chip = m_inventory.Chips.FirstOrDefault(x => x.Id == chipKey);
+            if(chip != null)
             {
-                int lastvalue = token.Quantity;
-                token.Quantity = values[i];
+                int lastvalue = chip.Quantity;
+                chip.Quantity = values[i];
 
-                m_totalTokensCount += token.Quantity - lastvalue;
+                m_totalChipsCount += chip.Quantity - lastvalue;
             }
         }
     }
 
     public void Reset(PlayerInventorySO playerInventorySO)
     {
-        m_totalTokensCount = 0;
+        m_totalChipsCount = 0;
         for(int i=0; i < playerInventorySO.Chips.Count; i++)
         {
             m_inventory.Chips[i].Quantity = playerInventorySO.Chips[i].Quantity;
-            m_totalTokensCount += m_inventory.Chips[i].Quantity;
+            m_totalChipsCount += m_inventory.Chips[i].Quantity;
         }
     }
 }

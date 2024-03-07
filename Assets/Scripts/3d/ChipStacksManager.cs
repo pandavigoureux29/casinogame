@@ -9,8 +9,6 @@ public class ChipStacksManager : MonoBehaviour
     ChipStack m_chipStackPrefab;
     [SerializeField]
     private float m_spacing = 1;
-    [SerializeField]
-    private bool m_isFlexible = false;
 
     private Dictionary<string,ChipStack> m_stacks = new Dictionary<string, ChipStack>();
 
@@ -46,6 +44,14 @@ public class ChipStacksManager : MonoBehaviour
     {
         ChipStack stack = GetStack(chipData.Id);
         stack.Refresh(chipData, quantity);
+    }
+
+    public void Clear()
+    {
+        foreach(var stack in m_stacks.Values)
+        {
+            stack.ClearStack();
+        }
     }
 
     private void PlaceStack(ChipStack stack)
