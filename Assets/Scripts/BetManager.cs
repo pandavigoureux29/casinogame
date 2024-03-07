@@ -153,6 +153,7 @@ public class BetManager : MonoBehaviour, IPunObservable
 
     public void OnDeclareBet()
     {
+        Debug.LogError("Player : " + m_gameManager.GetLocalPlayerId());
         DeclareBet(m_gameManager.GetLocalPlayerId(), m_currentSelectedLocalColor);
     }
 
@@ -175,6 +176,10 @@ public class BetManager : MonoBehaviour, IPunObservable
                 m_confirmedBetsCount++;
                 playerBetData.BetConfirmed = true;
             }
+            else
+            {
+                return;
+            }
 
             //check if all bets have been set and declared
             if(m_confirmedBetsCount < m_playersBetData.Count)
@@ -187,7 +192,7 @@ public class BetManager : MonoBehaviour, IPunObservable
             {
                 bool win = m_currentBetResultColor == bet.ColorBet;
 
-                m_gameManager.ConfirmBet_Master(bet.UserId, playerBetData.BetChipsCount, win);
+                m_gameManager.ConfirmBet_Master(bet.UserId, bet.BetChipsCount, win);
                 Debug.LogError("Bet " + bet.ColorBet + " for " + userId + " : " + win);
 
                 if (bet.UserId == m_gameManager.GetLocalPlayerId())
@@ -209,7 +214,7 @@ public class BetManager : MonoBehaviour, IPunObservable
         else
         {
             //notify master that the bet is set and confirmed
-            myPhotonView?.RPC("RPC_DeclareBet", RpcTarget.Others, m_gameManager.GetLocalPlayerId(), (int)m_currentSelectedLocalColor);
+            myPhotonView?.RPC("RPC_DeclareBet", RpcTarget.Others, userId, (int)m_currentSelectedLocalColor);
         }
     }
 

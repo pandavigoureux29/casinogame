@@ -34,7 +34,7 @@ public class PlayerInventory
         return GetQuantity(chipId) - currentBet > 0;
     }
 
-    public void UpdateQuantities(Dictionary<string, int> betChipIncrementsCount, bool win)
+    public void UpdateQuantities(Dictionary<string, int> betChipIncrementsCount)
     {
         foreach (var chipIncrementsCount in betChipIncrementsCount)
         {
@@ -42,12 +42,8 @@ public class PlayerInventory
             if(chip == null)
                 continue;
 
-            int earnings = chipIncrementsCount.Value;
-            if(!win)
-                earnings *= -1;
-
-            chip.Quantity += earnings;
-            m_totalChipsCount += earnings;
+            chip.Quantity += chipIncrementsCount.Value;
+            m_totalChipsCount += chipIncrementsCount.Value;
         }
     }
 

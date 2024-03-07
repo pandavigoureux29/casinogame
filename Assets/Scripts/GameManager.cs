@@ -92,8 +92,15 @@ public class GameManager : MonoBehaviour, IPunObservable
         if (PhotonNetwork.IsMasterClient)
         {
             var inventory = GetInventory(userId);
+            foreach(var key in betTokensCount.Keys.ToList())
+            {
+                if (!win)
+                {
+                    betTokensCount[key] *= -1;
+                }
+            }
             //apply the bet to inventory and update client's
-            inventory.UpdateQuantities(betTokensCount,win);
+            inventory.UpdateQuantities(betTokensCount);
 
             //reset condition
             if(inventory.TotalTokensCount <= 0)
@@ -103,7 +110,7 @@ public class GameManager : MonoBehaviour, IPunObservable
 
             List<string> keys;
             List<int> values;
-            GetInventory(userId).GetTokensForNetwork(out keys, out values);
+            inventory.GetTokensForNetwork(out keys, out values);
             myPhotonView?.RPC("RPC_UpdateInventory", RpcTarget.Others, userId, keys.ToArray(), values.ToArray());
 
             OnInventoryUpdated?.Invoke(inventory);        }

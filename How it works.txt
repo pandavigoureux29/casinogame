@@ -1,32 +1,16 @@
 Photon App Id : 5daa9bd9-432c-4e9c-9567-a9e1785fc4dc
 
-Everything happens in the ConnectScene. Ultimately it should do the connection in this scene then Load a scene on the MasterClient when all players are ready
-
-The NetworkController handles the connection. Once both players are connected, it tells the GameManager to start the game.
-
-The GameManager begins by telling the GridManager to generate the grid on MasterClient. Once it's done, it gets the indexes where there are green chips and sends it to the 
-other player via an RPC. The client can then begin generating its own grid with this data. We only send green chips positions to avoid sending too much data throught the network. With the current exercise, we can just infer the red chips position ( this should be refactored if we have more colors in the future )
-
-GameManager handles the game flow RPCs. It's kind of the hub for any action we wanna take in the game.
-BetManager handles the calls related to betting.
-Both of them need each other so it would be more interesting to use dependency injection, but I didnt have the time to set it up
-
-The GameManager on the MasterClient ensures the players cannot bet more than they have, so the Client cannot cheat by sending corrupt data.
-
 Flow:
 1. Player adds/remove Tokens that they wanna be (AddTokenToBet/RemoveTokenFromBet in BetManager)
 2. Select the color you wanna bet on (ChangeBetColor in BetManager)
 3. Click on BET !! and set if you won (DeclareBet in BetManager)
 
-When all chips on the board have been flipped, the colors are regenerated on MasterClient and we unlfip every chip
-Player that has no token left gets their inventory refilled with initial values.
-
-Notes: 
-- Somehow, the property UserId was null for some players. That's why I'm using ActorNumber instead which seems to be working, since I didn't want to lose time investigating.
-(that was not the point of the exercise imo)
 
 optional :
 Enlever des trucs de UIInventory ( bet button etc... )
 
 bug : affichage du nombre de chips quand on depasse 10 bet
+disable bet button when is declared
+text when winning/losing on the ui of the buttons
+
 
