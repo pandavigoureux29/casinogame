@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
@@ -22,6 +23,8 @@ public class ChipStacksHubManager : MonoBehaviour
 
     private Dictionary<string, ChipStacksManager> m_inventoryStacksMap;
     private Dictionary<string, ChipStacksManager> m_betStacksMap;
+
+    public Action<ChipStacksManager> OnInitialized;
 
     private void Awake()
     {
@@ -53,9 +56,9 @@ public class ChipStacksHubManager : MonoBehaviour
         m_localBetStack.Initialize(m_inventorySO);
         m_otherBetStack.Initialize(m_inventorySO);
 
+        //keep stacks in dicos
         m_betStacksMap = new Dictionary<string, ChipStacksManager>();
         m_inventoryStacksMap = new Dictionary<string, ChipStacksManager>();
-
 
         m_betStacksMap[localInventory.UserId] = m_localBetStack;
         m_inventoryStacksMap[localInventory.UserId] = m_localInventoryStacks;
@@ -64,6 +67,8 @@ public class ChipStacksHubManager : MonoBehaviour
             m_betStacksMap[otherInventory.UserId] = m_otherBetStack;
             m_inventoryStacksMap[otherInventory.UserId] = m_otherInventoryStacks;
         }
+
+        OnInitialized?.Invoke(m_localInventoryStacks);
     }
 
     private void OnInventoryUpdated(PlayerInventory inventory)

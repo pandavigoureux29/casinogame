@@ -9,6 +9,8 @@ public class UITokenInventory : MonoBehaviour
     List<UIToken> m_tokens;
 
     [SerializeField]
+    ChipStacksHubManager m_hubManager;
+    [SerializeField]
     private GameManager m_gameManager;
     [SerializeField]
     private UIToken m_tokenPrefab;
@@ -19,14 +21,14 @@ public class UITokenInventory : MonoBehaviour
     [SerializeField]
     private Button m_betButton;
 
-    private PlayerInventory m_inventory;
+    private ChipStacksManager m_stacksManager;
 
     private List<UIToken> m_uiTokens = new List<UIToken>();
     private Dictionary<string, int> m_betTokensCount = new Dictionary<string, int>();
 
     private void Awake()
     {
-        m_gameManager.OnInventoriesInitialized += OnInventoriesInitialized;
+        m_hubManager.OnInitialized += OnStacksInitialized;
         m_gameManager.BetManager.OnBetConfirmed += OnBetConfirmed;
         m_gameManager.OnInventoryUpdated += OnInventoryUpdated;
         m_gameManager.BetManager.OnBetQuantityChanged += OnBetQuantityChanged;
@@ -42,24 +44,17 @@ public class UITokenInventory : MonoBehaviour
         }
     }
 
-    private void OnInventoriesInitialized(PlayerInventory localInventory, PlayerInventory otherInventory)
+    private void OnStacksInitialized(ChipStacksManager manager)
     {
-        m_inventory = m_isLocal ? localInventory : otherInventory;    
-
-        if(m_inventory == null || m_inventory.Inventory == null)
-        {
-            return;
-        }
-
-        foreach (var token in m_inventory.Inventory.Chips)
+        m_stacksManager = manager;
+        foreach (var stack in m_stacksManager.Stacks)
         {
             var go = Instantiate(m_tokenPrefab, transform);
             var uiToken = go.GetComponent<UIToken>();
-            uiToken.InitializeToken(this, token);
+            uiToken.InitializeToken(this, stack.Value);
             m_uiTokens.Add(uiToken);
         }
-
-        m_gameManager.OnInventoriesInitialized -= OnInventoriesInitialized;
+        m_hubManager.OnInitialized -= OnStacksInitialized;
     }
 
     public void OnAddBetStacked(UIToken token, bool sendEvent=true)
@@ -72,7 +67,7 @@ public class UITokenInventory : MonoBehaviour
 
         //send to network
         if(sendEvent)
-            m_gameManager.BetManager.AddChipsToBet(m_inventory, token.Id);
+            m_gameManager.BetManager.AddChipsToBet(m_stacksManager.Inventory, token.Id);
 
         UpdateBetButton();
     }
@@ -90,14 +85,14 @@ public class UITokenInventory : MonoBehaviour
 
         //send to network
         if (sendEvent)
-            m_gameManager.BetManager.RemoveChipsFromBet(m_inventory, token.Id);
+            m_gameManager.BetManager.RemoveChipsFromBet(m_stacksManager.Inventory, token.Id);
 
         UpdateBetButton();
     }
 
     private void OnBetQuantityChanged(string userId, string tokenId, int totalBetIncrements)
     {
-        if (m_inventory == null || m_inventory.UserId != userId)
+        if (m_stacksManager.Inventory == null || m_stacksManager.Inventory.UserId != userId)
         {
             return;
         }
@@ -117,7 +112,7 @@ public class UITokenInventory : MonoBehaviour
 
     public void OnInventoryUpdated(PlayerInventory inventory)
     {
-        if(inventory == m_inventory)
+        if(inventory == m_stacksManager.Inventory)
         {
             foreach (var uiToken in m_uiTokens)
             {
@@ -129,7 +124,7 @@ public class UITokenInventory : MonoBehaviour
 
     public void OnTurnChanged(string userId)
     {
-        bool toggle = m_inventory.UserId == userId;
+        bool toggle = m_stacksManager.Inventory.UserId == userId;
 
         foreach (var uiToken in m_uiTokens)
         {

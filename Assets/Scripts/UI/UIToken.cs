@@ -8,34 +8,37 @@ using UnityEngine.UI;
 public class UIToken : MonoBehaviour
 {
     [SerializeField]
-    private Image m_image;
-
-    [SerializeField]
     private TextMeshProUGUI m_quantityText;
 
     [SerializeField]
-    private GameObject m_buttonsContainer;
+    private Button m_buttonAdd;
+    [SerializeField]
+    private Button m_buttonRemove;
 
     private UITokenInventory m_uiTokenInventory;
-    private ChipData m_token;
-    public ChipData Token => m_token;
+    private ChipData m_chipData;
+    public ChipData Token => m_chipData;
 
     private string m_id;
     public string Id => m_id;
 
     private int m_betIncrements = 0;
 
-    public void InitializeToken(UITokenInventory inventory, ChipData token)
+    public void InitializeToken(UITokenInventory inventory, ChipStack stack)
     {
         m_uiTokenInventory = inventory;
-        m_id = token.Id;
-        UpdateQuantity(token.Quantity);
-        m_token = token;
+        m_id = stack.ChipData.Id;
+        m_chipData = stack.ChipData;
+        UpdateQuantity();
+        SetPosition(stack);
+        SetButtonColor(m_buttonAdd);
+        SetButtonColor(m_buttonRemove);
     }
 
     public void Toggle(bool toggle)
     {
-        m_buttonsContainer.SetActive(toggle);
+        m_buttonAdd.gameObject.SetActive(toggle);
+        m_buttonRemove.gameObject.SetActive(toggle);
     }
 
     public void UpdateQuantity(int qty)
@@ -45,14 +48,14 @@ public class UIToken : MonoBehaviour
 
     public void UpdateQuantity()
     {
-        var qty = m_token.Quantity - m_betIncrements * BetManager.S_BET_INCREMENTS;
+        var qty = m_chipData.Quantity - m_betIncrements * BetManager.S_BET_INCREMENTS;
         UpdateQuantity(qty);
     }
 
     public void OnAddBetClicked()
     {
         var currentBet = m_betIncrements * BetManager.S_BET_INCREMENTS;
-        if( m_token.Quantity - currentBet >= BetManager.S_BET_INCREMENTS)
+        if( m_chipData.Quantity - currentBet >= BetManager.S_BET_INCREMENTS)
         {
             m_betIncrements++;
             UpdateQuantity();
@@ -91,4 +94,40 @@ public class UIToken : MonoBehaviour
     {
         m_betIncrements = 0;
     }
+
+    private void SetButtonColor(Button button)
+    {
+        var colors = button.colors;
+        colors.normalColor = m_chipData.Color;
+        colors.selectedColor = m_chipData.Color;
+        button.colors = colors;
+    }
+
+    private void SetPosition(ChipStack stack)
+    {
+        Canvas canvas = GetComponentInParent<Canvas>();
+        Transform stackTransform = stack.GetBaseTransform();
+        RectTransform rectTransform = GetComponent<RectTransform>();
+
+        //var newPos = RectTransformUtility.WorldToScreenPoint(Camera.main, stackTransform.TransformPoint(m_worldOffset));
+        var newPos = WorldToCanvasPosition(canvas.GetComponent<RectTransform>(), Camera.main, stack.GetBaseTransform().position);
+        newPos.y = 0;
+
+        rectTransform.anchoredPosition = newPos;
+    }
+
+    private Vector2 WorldToCanvasPosition(RectTransform canvas, Camera camera, Vector3 position)
+    {
+        Vector2 temp = camera.WorldToViewportPoint(position);
+
+        //Calculate position considering our percentage, using our canvas size
+        temp.x *= canvas.sizeDelta.x;
+        temp.y *= canvas.sizeDelta.y;
+
+        temp.x -= canvas.sizeDelta.x * canvas.pivot.x;
+        temp.y -= canvas.sizeDelta.y * canvas.pivot.y;
+
+        return temp;
+    }
+
 }

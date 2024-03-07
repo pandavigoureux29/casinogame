@@ -11,8 +11,10 @@ public class ChipStacksManager : MonoBehaviour
     private float m_spacing = 1;
 
     private Dictionary<string,ChipStack> m_stacks = new Dictionary<string, ChipStack>();
+    public Dictionary<string,ChipStack> Stacks => m_stacks;
 
     private PlayerInventory m_inventory;
+    public PlayerInventory Inventory => m_inventory;
 
     public void Initialize(PlayerInventorySO playerInventorySO)
     {

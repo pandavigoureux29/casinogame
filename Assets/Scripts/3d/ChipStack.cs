@@ -15,6 +15,9 @@ public class ChipStack : MonoBehaviour
     private string m_Id;
     public string Id => m_Id;
 
+    private ChipData m_chipData;
+    public ChipData ChipData => m_chipData;
+
     private Dictionary<string, List<Chip>> m_chips = new Dictionary<string, List<Chip>>();
 
     private List<Chip> m_chipsPool = new List<Chip>();
@@ -25,6 +28,9 @@ public class ChipStack : MonoBehaviour
 
     public void AddChips(ChipData chipData, int quantity)
     {
+        m_Id = chipData.Id;
+        m_chipData = chipData;
+
         for (int i = 0; i < quantity; i++)
         {
             Chip chip = TakeChipFromPool();
@@ -99,5 +105,14 @@ public class ChipStack : MonoBehaviour
         chip.gameObject.SetActive(false);
         chip.transform.SetAsLastSibling();
         m_chipsPool.Add(chip);
+    }
+
+    public Transform GetBaseTransform()
+    {
+        if(m_chips.Count > 0)
+        {
+            return m_chips.ElementAt(0).Value[0].transform;
+        }
+        return transform;
     }
 }

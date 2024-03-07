@@ -79,4 +79,4 @@ MonoBehaviour:
   m_chipPrefab: {fileID: 8130099501499308487, guid: 9520bb80cdec3ab4a8129b4d1465bf58,
     type: 3}
   m_chipContainer: {fileID: 6461261972024205703}
-  m_spacing: 0.009
+  m_spacing: 0.008
