@@ -16,8 +16,7 @@ public class BetManager : MonoBehaviour, IPunObservable
     private GameManager m_gameManager;
 
 
-    public Action<string,string, int> OnAddChipsToBet;
-    public Action<string,string, int> OnRemoveChipsFromBet;
+    public Action<string, string, int> OnBetQuantityChanged;
     public Action<bool> OnBetConfirmed;
 
     private PhotonView myPhotonView;
@@ -60,73 +59,90 @@ public class BetManager : MonoBehaviour, IPunObservable
 
     #region BET
 
-    public void AddTokenToBet(PlayerInventory playerInventory, string tokenId)
+    public void AddChipsToBet(PlayerInventory playerInventory, string chipId)
     {
         if (PhotonNetwork.IsMasterClient)
         {
-            AddTokenOnMaster(playerInventory.UserId, tokenId);
+            var totalBetIncrements = AddChipsOnMaster(playerInventory.UserId, chipId);
+            OnBetQuantityChanged?.Invoke(playerInventory.UserId, chipId, totalBetIncrements);
+
+            myPhotonView?.RPC("RPC_OnBetQuantityChanged_Client", RpcTarget.Others, playerInventory.UserId, chipId, totalBetIncrements);
+        }
+        else
+        {
+            myPhotonView?.RPC("RPC_AddChipsToBet_Master", RpcTarget.MasterClient, playerInventory.UserId, chipId);
         }
 
-        OnAddChipsToBet?.Invoke(playerInventory.UserId, tokenId, S_BET_INCREMENTS);
-
-        myPhotonView?.RPC("RPC_AddTokenToBet", RpcTarget.Others, playerInventory.UserId, tokenId);
     }
 
-    private void AddTokenOnMaster(string userId, string tokenId)
+    private int AddChipsOnMaster(string userId, string chipId)
     {
         var playerBetData = GetPlayerBetData(userId);
-        if (!playerBetData.BetTokensCount.ContainsKey(tokenId))
+        if (!playerBetData.BetTokensCount.ContainsKey(chipId))
         {
-            playerBetData.BetTokensCount[tokenId] = 0;
+            playerBetData.BetTokensCount[chipId] = 0;
         }
 
-        var currentBet = playerBetData.BetTokensCount[tokenId] * S_BET_INCREMENTS;
-        if (m_gameManager.GetInventory(m_gameManager.GetCurrentInventory().UserId).CanBetMore(tokenId, currentBet))
+        var currentBet = playerBetData.BetTokensCount[chipId] * S_BET_INCREMENTS;
+        if (m_gameManager.GetInventory(m_gameManager.GetCurrentInventory().UserId).CanBetMore(chipId, currentBet))
         {
-            playerBetData.BetTokensCount[tokenId]++;
+            playerBetData.BetTokensCount[chipId]++;
         }
+
+        return playerBetData.BetTokensCount[chipId];
     }
 
     [PunRPC]
-    private void RPC_AddTokenToBet(string userId, string tokenId)
+    private void RPC_AddChipsToBet_Master(string userId, string chipId)
     {
         if (PhotonNetwork.IsMasterClient)
         {
-            AddTokenOnMaster(userId, tokenId);
+            var inventory = m_gameManager.GetInventory(userId);
+            AddChipsToBet(inventory, chipId);
         }
-
-        OnAddChipsToBet?.Invoke(userId, tokenId, S_BET_INCREMENTS);
     }
 
-    private void RemoveTokenOnMaster(string userId, string tokenId)
+
+    public void RemoveChipsFromBet(PlayerInventory playerInventory, string chipId)
+    {
+        if (PhotonNetwork.IsMasterClient)
+        {
+            //remove chips and notify client of new quantity
+            int totalBetIncrements = RemoveChipsOnMaster(playerInventory.UserId, chipId);
+            OnBetQuantityChanged?.Invoke(playerInventory.UserId, chipId, totalBetIncrements);
+            myPhotonView?.RPC("RPC_OnBetQuantityChanged_Client", RpcTarget.Others, playerInventory.UserId, chipId, totalBetIncrements);
+        }
+        else
+        {
+            myPhotonView?.RPC("RPC_RemoveChipsFromBet_Master", RpcTarget.MasterClient, playerInventory.UserId, chipId);
+        }
+    }
+
+    private int RemoveChipsOnMaster(string userId, string chipId)
     {
         var playerBetData = GetPlayerBetData(userId);
-        if (!playerBetData.BetTokensCount.ContainsKey(tokenId) || playerBetData.BetTokensCount[tokenId] == 0)
-            return;
+        if (!playerBetData.BetTokensCount.ContainsKey(chipId) || playerBetData.BetTokensCount[chipId] == 0)
+            return 0;
 
-        playerBetData.BetTokensCount[tokenId]--;
-    }
-
-    public void RemoveTokenFromBet(PlayerInventory playerInventory, string tokenId)
-    {
-        if (PhotonNetwork.IsMasterClient)
-        {
-            RemoveTokenOnMaster(playerInventory.UserId, tokenId);
-        }
-
-        OnRemoveChipsFromBet?.Invoke(playerInventory.UserId, tokenId, S_BET_INCREMENTS);
-        myPhotonView?.RPC("RPC_RemoveTokenFromBet", RpcTarget.Others, playerInventory.UserId, tokenId);
+        playerBetData.BetTokensCount[chipId]--;
+        return playerBetData.BetTokensCount[chipId];
     }
 
     [PunRPC]
-    private void RPC_RemoveTokenFromBet(string userId, string tokenId)
+    private void RPC_RemoveChipsFromBet_Master(string userId, string chipId)
     {
         if (PhotonNetwork.IsMasterClient)
         {
-            RemoveTokenOnMaster(userId, tokenId);
+            var inventory = m_gameManager.GetInventory(userId);
+            RemoveChipsFromBet(inventory, chipId);
         }
+    }
 
-        OnRemoveChipsFromBet?.Invoke(userId, tokenId, S_BET_INCREMENTS);
+    //from Master to client when the bet quantity has changed
+    [PunRPC]
+    private void RPC_OnBetQuantityChanged_Client(string userId, string chipId, int totalBetIncrements)
+    {
+        OnBetQuantityChanged?.Invoke(userId, chipId, totalBetIncrements);
     }
 
     #endregion

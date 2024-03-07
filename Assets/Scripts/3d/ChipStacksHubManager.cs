@@ -27,8 +27,7 @@ public class ChipStacksHubManager : MonoBehaviour
     {
         m_gameManager.OnInventoriesInitialized += OnInventoriesInitialized;
         m_gameManager.OnInventoryUpdated += OnInventoryUpdated;
-        m_gameManager.BetManager.OnAddChipsToBet += OnAddChipsToBet;
-        m_gameManager.BetManager.OnRemoveChipsFromBet += OnRemoveChipsToBet;
+        m_gameManager.BetManager.OnBetQuantityChanged += OnBetQuantityChanged;
     }
 
     private void OnDestroy()
@@ -39,8 +38,7 @@ public class ChipStacksHubManager : MonoBehaviour
             m_gameManager.OnInventoryUpdated -= OnInventoryUpdated;
             if(m_gameManager.BetManager != null)
             {
-
-                m_gameManager.BetManager.OnAddChipsToBet -= OnAddChipsToBet;
+                m_gameManager.BetManager.OnBetQuantityChanged -= OnBetQuantityChanged;
             }
         }
     }
@@ -71,17 +69,14 @@ public class ChipStacksHubManager : MonoBehaviour
         m_inventoryStacksMap[inventory.UserId].RefreshFromInventory();
     }
 
-    private void OnAddChipsToBet(string userId, string chipId, int quantity)
+    private void OnBetQuantityChanged(string userId, string chipId, int totalBetIncrements)
     {
         var chipData = m_inventorySO.GetChipData(chipId);
-        m_betStacksMap[userId].AddChips(chipData, quantity);
-        m_inventoryStacksMap[userId].RemoveChips(chipData,quantity);
-    }
+        var inventory = m_gameManager.GetInventory(userId);
+        int currentQuantity = inventory.GetQuantity(chipId);
+        int totalBetChipsCount = totalBetIncrements * BetManager.S_BET_INCREMENTS;
 
-    private void OnRemoveChipsToBet(string userId, string chipId, int quantity)
-    {
-        var chipData = m_inventorySO.GetChipData(chipId);
-        m_betStacksMap[userId].RemoveChips(chipData, quantity);
-        m_inventoryStacksMap[userId].AddChips(chipData, quantity);
+        m_betStacksMap[userId].RefreshChips(chipData, totalBetChipsCount);
+        m_inventoryStacksMap[userId].RefreshChips(chipData, currentQuantity - totalBetChipsCount);
     }
 }

@@ -21,17 +21,17 @@ public class PlayerInventory
         m_totalTokensCount = playerInventorySO.Chips.Sum(x=> x.Quantity);
     }
 
-    public int GetQuantity(string tokenId)
+    public int GetQuantity(string chipId)
     {
-        var token = m_inventory.Chips.FirstOrDefault(x => x.Id == tokenId);
+        var token = m_inventory.Chips.FirstOrDefault(x => x.Id == chipId);
         if (token == null)
             return 0;
         return token.Quantity;
     }
 
-    public bool CanBetMore(string tokenId, int currentBet)
+    public bool CanBetMore(string chipId, int currentBet)
     {
-        return GetQuantity(tokenId) - currentBet >= BetManager.S_BET_INCREMENTS;
+        return GetQuantity(chipId) - currentBet >= BetManager.S_BET_INCREMENTS;
     }
 
     public void UpdateQuantities(Dictionary<string, int> m_betTokensCount, bool win)

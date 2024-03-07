@@ -23,7 +23,7 @@ public class UIToken : MonoBehaviour
     private string m_id;
     public string Id => m_id;
 
-    private int m_betStacks = 0;
+    private int m_betIncrements = 0;
 
     public void InitializeToken(UITokenInventory inventory, ChipData token)
     {
@@ -45,16 +45,16 @@ public class UIToken : MonoBehaviour
 
     public void UpdateQuantity()
     {
-        var qty = m_token.Quantity - m_betStacks * BetManager.S_BET_INCREMENTS;
+        var qty = m_token.Quantity - m_betIncrements * BetManager.S_BET_INCREMENTS;
         UpdateQuantity(qty);
     }
 
     public void OnAddBetClicked()
     {
-        var currentBet = m_betStacks * BetManager.S_BET_INCREMENTS;
+        var currentBet = m_betIncrements * BetManager.S_BET_INCREMENTS;
         if( m_token.Quantity - currentBet >= BetManager.S_BET_INCREMENTS)
         {
-            m_betStacks++;
+            m_betIncrements++;
             UpdateQuantity();
             m_uiTokenInventory.OnAddBetStacked(this);
         }
@@ -62,9 +62,9 @@ public class UIToken : MonoBehaviour
 
     public void OnRemoveBetClicked()
     {
-        if(m_betStacks > 0)
+        if(m_betIncrements > 0)
         {
-            m_betStacks--;
+            m_betIncrements--;
             UpdateQuantity();
             m_uiTokenInventory.OnRemoveBetStacked(this);
         }
@@ -72,17 +72,23 @@ public class UIToken : MonoBehaviour
 
     public void UpdateAddBet()
     {
-        m_betStacks++;
+        m_betIncrements++;
         UpdateQuantity();
     }
     public void UpdateRemoveBet()
     {
-        m_betStacks--;
+        m_betIncrements--;
+        UpdateQuantity();
+    }
+
+    public void UpdateIncrement(int increments)
+    {
+        m_betIncrements = increments;
         UpdateQuantity();
     }
 
     public void ClearBetStacks()
     {
-        m_betStacks = 0;
+        m_betIncrements = 0;
     }
 }

@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Chips:
   - Id: Blue
-    Quantity: 10
+    Quantity: 40
     Material: {fileID: 2100000, guid: 28019c880f2512746a0686b74e6b0c65, type: 2}
   - Id: BlueSky
     Quantity: 10

@@ -42,6 +42,12 @@ public class ChipStacksManager : MonoBehaviour
         stack.RemoveChips(chipData, quantity);
     }
 
+    public void RefreshChips(ChipData chipData, int quantity)
+    {
+        ChipStack stack = GetStack(chipData.Id);
+        stack.Refresh(chipData, quantity);
+    }
+
     private void PlaceStack(ChipStack stack)
     {
         var index = Mathf.Floor( m_stacks.Count / 2 );
