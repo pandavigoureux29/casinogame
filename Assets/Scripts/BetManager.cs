@@ -7,6 +7,8 @@ using UnityEngine;
 
 public class BetManager : MonoBehaviour, IPunObservable
 {
+    public enum EColor {NONE, GREEN, RED }
+
     //probably best in a config 
     public static int S_BET_INCREMENTS = 10;
 
@@ -20,12 +22,40 @@ public class BetManager : MonoBehaviour, IPunObservable
 
     private PhotonView myPhotonView;
 
-    private ReversableChip.EColor m_currentColor;
-    private Dictionary<string, int> m_betTokensCount = new Dictionary<string, int>();
+    private Dictionary<string, PlayerBetData> m_playersBetData;
+    /// <summary>
+    /// Color the local player is betting on
+    /// </summary>
+    private EColor m_currentSelectedLocalColor = EColor.NONE;
+    public bool IsColorSelected => m_currentSelectedLocalColor != EColor.NONE;
+
+    /// <summary>
+    /// Color generated on Master that is the result to guess
+    /// </summary>
+    private EColor m_currentBetResultColor = EColor.NONE;
+
+    private int m_confirmedBetsCount = 0;
 
     void Start()
     {
         myPhotonView = GetComponent<PhotonView>();
+    }
+
+    public void Initialize(int[] userIds)
+    {
+        m_playersBetData = new Dictionary<string, PlayerBetData>(m_confirmedBetsCount);
+        foreach(int userId in userIds)
+        {
+            m_playersBetData.Add(userId.ToString(),new PlayerBetData(userId.ToString()));
+        }
+        GenerateColorResult();
+    }
+
+    private void GenerateColorResult()
+    {
+        var r = UnityEngine.Random.Range(1, 100);
+        m_currentBetResultColor = r <= 50 ? EColor.GREEN : EColor.RED;
+        Debug.LogError("Color to guess " + m_currentBetResultColor.ToString());
     }
 
     #region BET
@@ -34,23 +64,24 @@ public class BetManager : MonoBehaviour, IPunObservable
     {
         if (PhotonNetwork.IsMasterClient)
         {
-            AddTokenOnMaster(tokenId);
+            AddTokenOnMaster(playerInventory.UserId, tokenId);
         }
 
         myPhotonView?.RPC("RPC_AddTokenToBet", RpcTarget.Others, playerInventory.UserId, tokenId);
     }
 
-    private void AddTokenOnMaster(string tokenId)
+    private void AddTokenOnMaster(string userId, string tokenId)
     {
-        if (!m_betTokensCount.ContainsKey(tokenId))
+        var playerBetData = GetPlayerBetData(userId);
+        if (!playerBetData.BetTokensCount.ContainsKey(tokenId))
         {
-            m_betTokensCount[tokenId] = 0;
+            playerBetData.BetTokensCount[tokenId] = 0;
         }
 
-        var currentBet = m_betTokensCount[tokenId] * S_BET_INCREMENTS;
+        var currentBet = playerBetData.BetTokensCount[tokenId] * S_BET_INCREMENTS;
         if (m_gameManager.GetInventory(m_gameManager.GetCurrentInventory().UserId).CanBetMore(tokenId, currentBet))
         {
-            m_betTokensCount[tokenId]++;
+            playerBetData.BetTokensCount[tokenId]++;
         }
     }
 
@@ -59,25 +90,26 @@ public class BetManager : MonoBehaviour, IPunObservable
     {
         if (PhotonNetwork.IsMasterClient)
         {
-            AddTokenOnMaster(tokenId);
+            AddTokenOnMaster(userId, tokenId);
         }
 
         OnAddTokenToBet?.Invoke(userId, tokenId);
     }
 
-    private void RemoveTokenOnMaster(string tokenId)
+    private void RemoveTokenOnMaster(string userId, string tokenId)
     {
-        if (!m_betTokensCount.ContainsKey(tokenId) || m_betTokensCount[tokenId] == 0)
+        var playerBetData = GetPlayerBetData(userId);
+        if (!playerBetData.BetTokensCount.ContainsKey(tokenId) || playerBetData.BetTokensCount[tokenId] == 0)
             return;
 
-        m_betTokensCount[tokenId]--;
+        playerBetData.BetTokensCount[tokenId]--;
     }
 
     public void RemoveTokenFromBet(PlayerInventory playerInventory, string tokenId)
     {
         if (PhotonNetwork.IsMasterClient)
         {
-            RemoveTokenOnMaster(tokenId);   
+            RemoveTokenOnMaster(playerInventory.UserId, tokenId);   
         }
 
         myPhotonView?.RPC("RPC_RemoveTokenFromBet", RpcTarget.Others, playerInventory.UserId, tokenId);
@@ -88,7 +120,7 @@ public class BetManager : MonoBehaviour, IPunObservable
     {
         if (PhotonNetwork.IsMasterClient)
         {
-            RemoveTokenOnMaster(tokenId);
+            RemoveTokenOnMaster(userId, tokenId);
         }
 
         OnRemoveTokenFromBet?.Invoke(userId, tokenId);
@@ -98,9 +130,9 @@ public class BetManager : MonoBehaviour, IPunObservable
 
     #region BET_COLOR
 
-    public void ChangeBetColor(ReversableChip.EColor eColor)
+    public void ChangeBetColor(EColor eColor)
     {
-        m_currentColor = eColor;
+        m_currentSelectedLocalColor = eColor;
     }
 
     #endregion
@@ -110,72 +142,129 @@ public class BetManager : MonoBehaviour, IPunObservable
 
     public void OnDeclareBet()
     {
-        if (m_gameManager.IsChipSelected)
-        {
-            DeclareBet(m_currentColor);
-        }
+        DeclareBet(m_gameManager.GetLocalPlayerId(), m_currentSelectedLocalColor);
     }
 
     //on master : confirm the bet and move on to next turn
     //on client : ask the master for confirmation
-    private void DeclareBet(ReversableChip.EColor color)
+    private void DeclareBet(string userId, EColor color)
     {
         if (PhotonNetwork.IsMasterClient)
         {
-            if (!IsBetValid())
+            var playerBetData = GetPlayerBetData(userId);
+            playerBetData.ColorBet = color;
+
+            //add a new confirmed bet count
+            if (playerBetData.IsBetValid())
             {
-                Debug.LogError("There's no token bet");
+                m_confirmedBetsCount++;
+                Debug.LogError("Bet is valid for " + userId);
+            }
+
+            //check if all bets have been set and declared
+            if(m_confirmedBetsCount < m_playersBetData.Count)
+            {
+                Debug.LogError("Still waiting for more bets");
                 return;
             }
-            bool isBetWon = m_gameManager.CheckChip(color);
 
-            m_gameManager.ConfirmBet(m_betTokensCount, isBetWon);
+            //check if all bets are valid
+            foreach (var bet in m_playersBetData.Values)
+            {
+                bool win = m_currentBetResultColor == bet.ColorBet;
 
-            //notify client that the bet is done
-            myPhotonView?.RPC("RPC_ConfirmBet", RpcTarget.Others, isBetWon, m_gameManager.CurrentPlayer.ActorNumber);
+                m_gameManager.ConfirmBet_Master(bet.UserId, playerBetData.BetTokensCount, win);
+                Debug.LogError("Bet " + bet.ColorBet + " for " + userId + " : " + win);
 
-            OnBetConfirmed?.Invoke(isBetWon);
+                if (bet.UserId == m_gameManager.GetLocalPlayerId())
+                {
+                    OnBetConfirmed?.Invoke(win);
+                }
+                else
+                {
+                    //notify client that the bet is done
+                    myPhotonView?.RPC("RPC_ConfirmBet", RpcTarget.Others, bet.UserId, win);
+                }
 
-            m_betTokensCount.Clear();
+                bet.Clear();
+            }
 
+            GenerateColorResult();
+            m_confirmedBetsCount = 0;
         }
         else
         {
             //notify master that the bet is set and confirmed
-            myPhotonView?.RPC("RPC_DeclareBet", RpcTarget.Others, (int)m_currentColor);
+            myPhotonView?.RPC("RPC_DeclareBet", RpcTarget.Others, m_gameManager.GetLocalPlayerId(), (int)m_currentSelectedLocalColor);
         }
     }
 
     //From client to master to declare the bet
     [PunRPC]
-    private void RPC_DeclareBet(int colorInt)
+    private void RPC_DeclareBet(string userId, int colorInt)
     {
-        ReversableChip.EColor sentColor = (ReversableChip.EColor)colorInt;
-        DeclareBet(sentColor);
+        EColor sentColor = (EColor)colorInt;
+        DeclareBet(userId, sentColor);
     }
 
     //From master to client to confirm the bet and update values
     [PunRPC]
-    public void RPC_ConfirmBet(bool isBetWon, int turnPlayerId)
+    public void RPC_ConfirmBet(string userId, bool isBetWon)
     {
-        m_gameManager.ConfirmBet(null, isBetWon, turnPlayerId);
-        OnBetConfirmed?.Invoke(isBetWon);
+        //m_gameManager.ConfirmBet_Master(userId, isBetWon);
+        if(userId == m_gameManager.GetLocalPlayerId())
+        {
+            OnBetConfirmed?.Invoke(isBetWon);
+        }
     }
 
     #endregion
 
-    private bool IsBetValid()
+    private PlayerBetData GetPlayerBetData(string userId)
     {
-        foreach ( var token in m_betTokensCount)
+        if(!m_playersBetData.ContainsKey(userId))
         {
-            if (token.Value > 0)
-                return true;
+            return null;
         }
-        return false;
+        return m_playersBetData[userId];
     }
 
     void IPunObservable.OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
 
+    }
+
+    public class PlayerBetData
+    {
+        public string UserId;
+        public EColor ColorBet;
+        public Dictionary<string, int> BetTokensCount = new Dictionary<string, int>();
+        public bool BetConfirmed = false;
+
+        public PlayerBetData(string userId)
+        {
+            UserId = userId;
+        }
+
+        public void Clear()
+        {
+            ColorBet = EColor.NONE;
+            BetTokensCount.Clear();
+            BetConfirmed = false;
+        }
+
+        public bool IsBetValid()
+        {
+            bool hasAtLeastOneBetToken = false;
+            foreach (var token in BetTokensCount)
+            {
+                if (token.Value > 0)
+                {
+                    hasAtLeastOneBetToken = true;
+                }
+            }
+
+            return hasAtLeastOneBetToken && ColorBet != EColor.NONE;
+        }
     }
 }

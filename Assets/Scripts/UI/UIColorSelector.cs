@@ -14,6 +14,9 @@ public class UIColorSelector : MonoBehaviour
     [SerializeField]
     private Button m_button;
 
+    [SerializeField]
+    private UITokenInventory m_tokenInventory;
+
     private int m_currentColorDataIndex;
 
     private void Awake()
@@ -41,12 +44,14 @@ public class UIColorSelector : MonoBehaviour
         m_button.colors = colors;
 
         m_betManager.ChangeBetColor(colorData.ColorEnum);
+
+        m_tokenInventory.UpdateBetButton();
     }
 
     [Serializable]
     public class ColorData
     {
         public Color Color;
-        public ReversableChip.EColor ColorEnum;
+        public BetManager.EColor ColorEnum;
     }
 }

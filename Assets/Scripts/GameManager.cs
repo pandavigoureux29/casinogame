@@ -20,23 +20,15 @@ public class GameManager : MonoBehaviour, IPunObservable
     public BetManager BetManager => m_betManager;
 
     [SerializeField]
-    GridManager m_gridManager;
-    [SerializeField]
     PlayerInventorySO m_inventorySO;
 
     PlayerInventory m_localPlayerInventory;
     PlayerInventory m_otherPlayerInventory;
 
-    private Player m_currentPlayer;
-    public Player CurrentPlayer => m_currentPlayer;
+    List<PlayerInventory> m_playerInventories;
 
     public Action<PlayerInventory, PlayerInventory> OnInventoriesInitialized;
-    public Action<string> OnTurnChanged;
     public Action<PlayerInventory> OnInventoryUpdated;
-    public Action<int> OnChipSelected;
-
-    private int m_currentSelectedChip = -1;
-    public bool IsChipSelected => m_currentSelectedChip >= 0;
 
     // Start is called before the first frame update
     void Start()
@@ -52,8 +44,6 @@ public class GameManager : MonoBehaviour, IPunObservable
         {
             StartGame();
         }
-
-        CheckSelectedChip();
     }
 
     public void StartGame()
@@ -64,30 +54,22 @@ public class GameManager : MonoBehaviour, IPunObservable
         {
             var userIds = PhotonNetwork.PlayerList.Select(x => x.ActorNumber).ToArray();
             InitializePlayers(userIds);
-            m_gridManager.InstantiateGrid();
 
-            m_currentPlayer = PhotonNetwork.LocalPlayer;
-            OnTurnChanged?.Invoke(m_currentPlayer.ActorNumber.ToString());
+            m_betManager.Initialize(userIds);
 
-            myPhotonView?.RPC("RPC_StartGame", RpcTarget.Others, 
-                m_gridManager.GreenIndexes.ToArray(),
-                userIds,
-                m_currentPlayer.ActorNumber); //workaround since some UserId are null on client
+            myPhotonView?.RPC("RPC_StartGame", RpcTarget.Others, userIds); //workaround since some UserId are null on client
         }
     }
 
     [PunRPC]
-    public void RPC_StartGame(int[] greenIndexes, int[] userIds, int turnPlayerId)
+    public void RPC_StartGame(int[] userIds)
     {
         InitializePlayers(userIds);
-        m_gridManager.InstantiateGrid(greenIndexes);
-
-        m_currentPlayer = PhotonNetwork.PlayerList.First(x=>x.ActorNumber==turnPlayerId);
-        OnTurnChanged?.Invoke(m_currentPlayer.ActorNumber.ToString());
     }
 
     private void InitializePlayers(int[] userIds)
     {
+        m_playerInventories = new List<PlayerInventory>();
         for (int i = 0; i < userIds.Count(); i++)
         {
             var inventory = new PlayerInventory(userIds[i].ToString(), Instantiate(m_inventorySO));
@@ -99,59 +81,17 @@ public class GameManager : MonoBehaviour, IPunObservable
             {
                 m_otherPlayerInventory = inventory;
             }
+            m_playerInventories.Add(inventory);
         }
 
         OnInventoriesInitialized?.Invoke(m_localPlayerInventory, m_otherPlayerInventory);
     }       
 
-    #region SELECT_CHIP
-
-    private void CheckSelectedChip()
+    public void ConfirmBet_Master(string userId, Dictionary<string, int> betTokensCount, bool win)
     {
-        if (m_currentPlayer == PhotonNetwork.LocalPlayer && Input.GetMouseButtonDown(0))
-        {
-            var chip = m_gridManager.GetClickedChip();
-            if (chip != null)
-            {
-                SelectChip(chip.Index);
-            }
-        }
-    }
-    
-    private void SelectChip(int chipIndex)
-    {
-        m_currentSelectedChip = chipIndex;
-        m_gridManager.SelectChip(chipIndex);
-        myPhotonView?.RPC("RPC_SelectChip", RpcTarget.Others, chipIndex);
-        OnChipSelected?.Invoke(chipIndex);
-    }
-
-    [PunRPC]
-    private void RPC_SelectChip(int chipIndex)
-    {
-        bool success = m_gridManager.SelectChip(chipIndex);
-        //this will check on MasterClient that we're not trying to select an already flipped chip
-        if (success)
-        {
-            m_currentSelectedChip = chipIndex;
-            OnChipSelected?.Invoke(chipIndex);
-        }
-    }
-
-    public bool CheckChip(ReversableChip.EColor color)
-    {
-        return m_gridManager.CheckChip(m_currentSelectedChip, color);
-    }
-
-    #endregion
-
-    public void ConfirmBet(Dictionary<string, int> betTokensCount, bool win, int turnPlayerId = -1)
-    {
-        m_gridManager.FlipChip(m_currentSelectedChip);
-
         if (PhotonNetwork.IsMasterClient)
         {
-            var inventory = GetCurrentInventory();
+            var inventory = GetInventory(userId);
             //apply the bet to inventory and update client's
             inventory.UpdateQuantities(betTokensCount,win);
 
@@ -161,36 +101,21 @@ public class GameManager : MonoBehaviour, IPunObservable
                 inventory.Reset(m_inventorySO);
             }
 
-            SendCurrentInventoryUpdate();
-            OnInventoryUpdated?.Invoke(inventory);
-
-            if (m_gridManager.IsEverythingFlipped)
-            {
-                ResetGrid_Master();
-            }
-
-            ChangeTurn();
-        }
-        else 
-        { 
-            //set the current player on client
-            m_currentPlayer = PhotonNetwork.PlayerList.First(x => x.ActorNumber == turnPlayerId);
-        }
-        m_currentSelectedChip = -1;
-        OnTurnChanged?.Invoke(m_currentPlayer.ActorNumber.ToString());
+            SendCurrentInventoryUpdate(userId);
+            OnInventoryUpdated?.Invoke(inventory);        }
     }
 
     /// <summary>
     /// Send the current inventory from the server to the client so it can update
     /// </summary>
-    public void SendCurrentInventoryUpdate()
+    public void SendCurrentInventoryUpdate(string userId)
     {
         if (PhotonNetwork.IsMasterClient)
         {
             List<string> keys;
             List<int> values;
-            GetCurrentInventory().GetTokensForNetwork(out keys, out values);
-            myPhotonView?.RPC("RPC_UpdateInventory", RpcTarget.Others, CurrentPlayer.ActorNumber.ToString(), keys.ToArray(), values.ToArray());
+            GetInventory(userId).GetTokensForNetwork(out keys, out values);
+            myPhotonView?.RPC("RPC_UpdateInventory", RpcTarget.Others, userId, keys.ToArray(), values.ToArray());
         }
     }
 
@@ -202,35 +127,10 @@ public class GameManager : MonoBehaviour, IPunObservable
         OnInventoryUpdated?.Invoke(inventory);
     }
 
-    private void ChangeTurn()
+    public string GetLocalPlayerId()
     {
-        if(m_currentPlayer == PhotonNetwork.LocalPlayer)
-        {
-            m_currentPlayer = PhotonNetwork.PlayerListOthers.FirstOrDefault();
-        }
-        else
-        {
-            m_currentPlayer = PhotonNetwork.LocalPlayer;
-        }
+        return PhotonNetwork.LocalPlayer.ActorNumber.ToString();
     }
-
-    #region RESET_GRID
-
-    private void ResetGrid_Master()
-    {
-        m_gridManager.ResetGrid();
-
-        myPhotonView?.RPC("RPC_ResetGrid", RpcTarget.Others,
-                m_gridManager.GreenIndexes.ToArray());
-    }
-
-    [PunRPC]
-    private void RPC_ResetGrid(int[] greenIndexes)
-    {
-        m_gridManager.ResetGrid(greenIndexes);
-    }
-
-    #endregion
 
     public PlayerInventory GetInventory(string userId)
     {
@@ -239,12 +139,7 @@ public class GameManager : MonoBehaviour, IPunObservable
 
     public PlayerInventory GetCurrentInventory()
     {
-        return m_localPlayerInventory.UserId == m_currentPlayer.ActorNumber.ToString() ? m_localPlayerInventory : m_otherPlayerInventory;
-    }
-
-    public bool IsLocalPlayerTurn()
-    {
-        return m_currentPlayer == PhotonNetwork.LocalPlayer;
+        return m_localPlayerInventory.UserId == PhotonNetwork.LocalPlayer.ActorNumber.ToString() ? m_localPlayerInventory : m_otherPlayerInventory;
     }
 
     void IPunObservable.OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)

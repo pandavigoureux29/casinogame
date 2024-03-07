@@ -34,8 +34,6 @@ public class UITokenInventory : MonoBehaviour
         m_gameManager.BetManager.OnRemoveTokenFromBet += OnRemoveBetEvent;
         m_gameManager.BetManager.OnBetConfirmed += OnBetConfirmed;
         m_gameManager.OnInventoryUpdated += OnInventoryUpdated;
-        m_gameManager.OnChipSelected += OnChipSelected;
-        m_gameManager.OnTurnChanged += OnTurnChanged;
     }
 
     private void OnDestroy()
@@ -46,8 +44,6 @@ public class UITokenInventory : MonoBehaviour
             m_gameManager.BetManager.OnRemoveTokenFromBet -= OnRemoveBetEvent;
             m_gameManager.BetManager.OnBetConfirmed -= OnBetConfirmed;
             m_gameManager.OnInventoryUpdated -= OnInventoryUpdated;
-            m_gameManager.OnChipSelected -= OnChipSelected;
-            m_gameManager.OnTurnChanged -= OnTurnChanged;
         }
     }
 
@@ -176,21 +172,14 @@ public class UITokenInventory : MonoBehaviour
         UpdateBetButton();
     }
 
-    private void OnChipSelected(int chipIndex)
-    {
-        UpdateBetButton();
-    }
-
-    private void UpdateBetButton()
+    public void UpdateBetButton()
     {
         if(m_betButton == null)
         {
             return;
         }
 
-        bool toggleButton = m_gameManager.IsLocalPlayerTurn();
-        toggleButton &= m_gameManager.IsChipSelected;
-        toggleButton &= m_betTokensCount.Count > 0;
+        bool toggleButton = m_gameManager.BetManager.IsColorSelected && m_betTokensCount.Count > 0;
 
         m_betButton.interactable = toggleButton;
     }

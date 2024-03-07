@@ -4,9 +4,6 @@ using UnityEngine;
 
 public class ReversableChip : MonoBehaviour
 {
-
-    public enum EColor { GREEN, RED }
-
     [SerializeField]
     private MeshRenderer m_quadRenderer;
 
@@ -26,16 +23,16 @@ public class ReversableChip : MonoBehaviour
         set { m_index = value; }
     }
 
-    private EColor m_color;
-    public EColor Color => m_color;
+    private BetManager.EColor m_color;
+    public BetManager.EColor Color => m_color;
 
     private bool m_isFlipped;
     public bool IsFlipped => m_isFlipped;
 
-    public void SetColor(EColor color)
+    public void SetColor(BetManager.EColor color)
     {
         m_color = color;
-        if(color == EColor.GREEN)
+        if(color == BetManager.EColor.GREEN)
         {
             m_quadRenderer.material = m_greenMaterial;
         }
