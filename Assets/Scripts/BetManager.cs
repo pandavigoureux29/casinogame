@@ -152,12 +152,17 @@ public class BetManager : MonoBehaviour, IPunObservable
         if (PhotonNetwork.IsMasterClient)
         {
             var playerBetData = GetPlayerBetData(userId);
+            if (playerBetData.BetConfirmed)
+            {
+                return;
+            }
             playerBetData.ColorBet = color;
 
             //add a new confirmed bet count
             if (playerBetData.IsBetValid())
             {
                 m_confirmedBetsCount++;
+                playerBetData.BetConfirmed = true;
                 Debug.LogError("Bet is valid for " + userId);
             }
 
