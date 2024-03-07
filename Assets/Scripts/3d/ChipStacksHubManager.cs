@@ -14,15 +14,15 @@ public class ChipStacksHubManager : MonoBehaviour
     private ChipStacksManager m_otherInventoryStacks;
 
     [SerializeField]
-    private ChipStacksManager m_localBetStack;
+    private BetStack m_localBetStack;
     [SerializeField]
-    private ChipStacksManager m_otherBetStack;
+    private BetStack m_otherBetStack;
 
     [SerializeField]
     PlayerInventorySO m_inventorySO;
 
     private Dictionary<string, ChipStacksManager> m_inventoryStacksMap;
-    private Dictionary<string, ChipStacksManager> m_betStacksMap;
+    private Dictionary<string, BetStack> m_betStacksMap;
 
     public Action<ChipStacksManager> OnInitialized;
 
@@ -53,11 +53,8 @@ public class ChipStacksHubManager : MonoBehaviour
         m_localInventoryStacks.Initialize(localInventory);
         m_otherInventoryStacks.Initialize(otherInventory);
 
-        m_localBetStack.Initialize(m_inventorySO);
-        m_otherBetStack.Initialize(m_inventorySO);
-
         //keep stacks in dicos
-        m_betStacksMap = new Dictionary<string, ChipStacksManager>();
+        m_betStacksMap = new Dictionary<string, BetStack>();
         m_inventoryStacksMap = new Dictionary<string, ChipStacksManager>();
 
         m_betStacksMap[localInventory.UserId] = m_localBetStack;
@@ -82,7 +79,7 @@ public class ChipStacksHubManager : MonoBehaviour
         var inventory = m_gameManager.GetInventory(userId);
         int currentQuantity = inventory.GetQuantity(chipId);
 
-        m_betStacksMap[userId].RefreshChips(chipData, totalBetCount);
+        m_betStacksMap[userId].Refresh(chipData, totalBetCount);
         m_inventoryStacksMap[userId].RefreshChips(chipData, currentQuantity - totalBetCount);
     }
 
@@ -90,7 +87,7 @@ public class ChipStacksHubManager : MonoBehaviour
     {
         foreach(var betStack in m_betStacksMap.Values)
         {
-            betStack.Clear();
+            betStack.ClearStack();
         }
     }
 }

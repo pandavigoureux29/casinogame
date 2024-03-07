@@ -12,35 +12,37 @@ public class ChipStack : MonoBehaviour
     [SerializeField]
     private float m_spacing = 0.05f;
 
-    private string m_Id;
-    public string Id => m_Id;
-
     private ChipData m_chipData;
     public ChipData ChipData => m_chipData;
 
-    private List<Chip> m_chips = new List<Chip>();
-    private List<Chip> m_chipsPool = new List<Chip>();
+    protected List<Chip> m_chips = new List<Chip>();
+    protected ChipsPool m_pool = new ChipsPool();
 
-    public int ActiveChips => m_totalChipsCount;
+    public int ActiveChips => m_chips.Count;
 
-    private int m_totalChipsCount = 0;
+    private void Awake()
+    {
+        m_pool.Initialize(m_chipPrefab, m_chipContainer);
+    }
 
     public void AddChips(ChipData chipData, int quantity)
     {
-        m_Id = chipData.Id;
+        if(quantity <= 0)
+        {
+            return;
+        }
+
         m_chipData = chipData;
 
         for (int i = 0; i < quantity; i++)
         {
-            Chip chip = TakeChipFromPool();
+            Chip chip = m_pool.TakeChipFromPool();
             chip.Refresh(chipData);
             chip.gameObject.SetActive(true);
 
             //place chip
-            chip.transform.localPosition = new Vector3(0, m_totalChipsCount * m_spacing, 0);
+            chip.transform.localPosition = new Vector3(0, m_chips.Count * m_spacing, 0);
             m_chips.Add(chip);
-
-            m_totalChipsCount++;
         }
     }
 
@@ -50,13 +52,11 @@ public class ChipStack : MonoBehaviour
         {
             var chip = m_chips[m_chips.Count - 1];
             m_chips.RemoveAt(m_chips.Count-1);
-            ReleaseToPool(chip);
-
-            m_totalChipsCount--;
+            m_pool.ReleaseToPool(chip);
         }
     }
 
-    public void Refresh(ChipData chipData, int quantity)
+    public virtual void Refresh(ChipData chipData, int quantity)
     {
         ClearStack();
         AddChips(chipData, quantity);
@@ -66,30 +66,17 @@ public class ChipStack : MonoBehaviour
     {
         foreach (var chip in m_chips)
         {
-            ReleaseToPool(chip);
+            m_pool.ReleaseToPool(chip);
         }
         m_chips.Clear();
-        m_totalChipsCount = 0;
-    }
+    }    
 
-    private Chip TakeChipFromPool()
+    public void ReplaceAll()
     {
-        if (m_chipsPool.Count == 0)
+        for(int i = 0; i < m_chips.Count; i++)
         {
-            var go = Instantiate(m_chipPrefab, m_chipContainer);
-            return go.GetComponent<Chip>();
+            m_chips[i].transform.localPosition = new Vector3(0, i * m_spacing, 0);
         }
-
-        var chip = m_chipsPool[0];
-        m_chipsPool.RemoveAt(0);
-        return chip;
-    }
-
-    private void ReleaseToPool(Chip chip)
-    {
-        chip.gameObject.SetActive(false);
-        chip.transform.SetAsLastSibling();
-        m_chipsPool.Add(chip);
     }
 
     public Transform GetBaseTransform()

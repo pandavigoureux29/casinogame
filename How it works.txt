@@ -28,3 +28,5 @@ Notes:
 optional :
 Enlever des trucs de UIInventory ( bet button etc... )
 
+bug : affichage du nombre de chips quand on depasse 10 bet
+

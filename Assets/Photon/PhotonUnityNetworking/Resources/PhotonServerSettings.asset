@@ -55,6 +55,8 @@ MonoBehaviour:
   - RPC_OnBetQuantityChanged_Client
   - RPC_AddChipsToBet_Master
   - RPC_RemoveChipsFromBet_Master
+  - RPC_AddChipToBet_Master
+  - RPC_RemoveChipFromBet_Master
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1
