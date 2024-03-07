@@ -18,8 +18,7 @@ public class ChipStack : MonoBehaviour
     private ChipData m_chipData;
     public ChipData ChipData => m_chipData;
 
-    private Dictionary<string, List<Chip>> m_chips = new Dictionary<string, List<Chip>>();
-
+    private List<Chip> m_chips = new List<Chip>();
     private List<Chip> m_chipsPool = new List<Chip>();
 
     public int ActiveChips => m_totalChipsCount;
@@ -37,15 +36,9 @@ public class ChipStack : MonoBehaviour
             chip.Refresh(chipData);
             chip.gameObject.SetActive(true);
 
-
-            if (!m_chips.ContainsKey(chipData.Id))
-            {
-                m_chips[chipData.Id] = new List<Chip>();
-            }
-
             //place chip
             chip.transform.localPosition = new Vector3(0, m_totalChipsCount * m_spacing, 0);
-            m_chips[chipData.Id].Add(chip);
+            m_chips.Add(chip);
 
             m_totalChipsCount++;
         }
@@ -55,15 +48,11 @@ public class ChipStack : MonoBehaviour
     {
         for (int i = 0; i < quantity; i++)
         {
-            var list = m_chips[chipData.Id];
-            var tokenImage = list.LastOrDefault();
-            if(tokenImage != null)
-            {
-                list.Remove(tokenImage);
-                ReleaseToPool(tokenImage);
+            var chip = m_chips[m_chips.Count - 1];
+            m_chips.RemoveAt(m_chips.Count-1);
+            ReleaseToPool(chip);
 
-                m_totalChipsCount--;
-            }
+            m_totalChipsCount--;
         }
     }
 
@@ -75,15 +64,11 @@ public class ChipStack : MonoBehaviour
 
     public void ClearStack()
     {
-        foreach (string key in m_chips.Keys)
+        foreach (var chip in m_chips)
         {
-            var list = m_chips[key];
-            foreach (Chip image in list)
-            {
-                ReleaseToPool(image);
-            }
-            list.Clear();
+            ReleaseToPool(chip);
         }
+        m_chips.Clear();
         m_totalChipsCount = 0;
     }
 
@@ -111,7 +96,7 @@ public class ChipStack : MonoBehaviour
     {
         if(m_chips.Count > 0)
         {
-            return m_chips.ElementAt(0).Value[0].transform;
+            return m_chips[0].transform;
         }
         return transform;
     }
