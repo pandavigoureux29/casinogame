@@ -76,15 +76,14 @@ public class ChipStacksHubManager : MonoBehaviour
         m_inventoryStacksMap[inventory.UserId].RefreshFromInventory();
     }
 
-    private void OnBetQuantityChanged(string userId, string chipId, int totalBetIncrements)
+    private void OnBetQuantityChanged(string userId, string chipId, int totalBetCount)
     {
         var chipData = m_inventorySO.GetChipData(chipId);
         var inventory = m_gameManager.GetInventory(userId);
         int currentQuantity = inventory.GetQuantity(chipId);
-        int totalBetChipsCount = totalBetIncrements * BetManager.S_BET_INCREMENTS;
 
-        m_betStacksMap[userId].RefreshChips(chipData, totalBetChipsCount);
-        m_inventoryStacksMap[userId].RefreshChips(chipData, currentQuantity - totalBetChipsCount);
+        m_betStacksMap[userId].RefreshChips(chipData, totalBetCount);
+        m_inventoryStacksMap[userId].RefreshChips(chipData, currentQuantity - totalBetCount);
     }
 
     private void OnBetConfirmed(bool win, BetManager.EColor betcolor)

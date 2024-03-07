@@ -48,14 +48,14 @@ public class UIChipBetIncrementer : MonoBehaviour
 
     public void UpdateQuantity()
     {
-        var qty = m_chipData.Quantity - m_betIncrements * BetManager.S_BET_INCREMENTS;
+        var qty = m_chipData.Quantity - m_betIncrements;
         UpdateQuantity(qty);
     }
 
     public void OnAddBetClicked()
     {
-        var currentBet = m_betIncrements * BetManager.S_BET_INCREMENTS;
-        if( m_chipData.Quantity - currentBet >= BetManager.S_BET_INCREMENTS)
+        var currentBet = m_betIncrements;
+        if( m_chipData.Quantity - currentBet > 0)
         {
             m_betIncrements++;
             UpdateQuantity();

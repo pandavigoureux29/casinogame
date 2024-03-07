@@ -65,7 +65,7 @@ public class UIIncrementers : MonoBehaviour
 
         //send to network
         if(sendEvent)
-            m_gameManager.BetManager.AddChipsToBet(m_stacksManager.Inventory, token.Id);
+            m_gameManager.BetManager.AddChipToBet(m_stacksManager.Inventory, token.Id);
 
         UpdateBetButton();
     }
@@ -83,7 +83,7 @@ public class UIIncrementers : MonoBehaviour
 
         //send to network
         if (sendEvent)
-            m_gameManager.BetManager.RemoveChipsFromBet(m_stacksManager.Inventory, token.Id);
+            m_gameManager.BetManager.RemoveChipFromBet(m_stacksManager.Inventory, token.Id);
 
         UpdateBetButton();
     }

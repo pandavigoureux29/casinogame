@@ -31,7 +31,7 @@ public class PlayerInventory
 
     public bool CanBetMore(string chipId, int currentBet)
     {
-        return GetQuantity(chipId) - currentBet >= BetManager.S_BET_INCREMENTS;
+        return GetQuantity(chipId) - currentBet > 0;
     }
 
     public void UpdateQuantities(Dictionary<string, int> betChipIncrementsCount, bool win)
@@ -42,7 +42,7 @@ public class PlayerInventory
             if(chip == null)
                 continue;
 
-            int earnings = chipIncrementsCount.Value * BetManager.S_BET_INCREMENTS;
+            int earnings = chipIncrementsCount.Value;
             if(!win)
                 earnings *= -1;
 

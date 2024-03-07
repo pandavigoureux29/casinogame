@@ -4,13 +4,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using static BetManager;
 
 public class BetManager : MonoBehaviour, IPunObservable
 {
     public enum EColor {NONE, GREEN, RED }
-
-    //probably best in a config 
-    public static int S_BET_INCREMENTS = 10;
 
     [SerializeField]
     private GameManager m_gameManager;
@@ -59,90 +57,83 @@ public class BetManager : MonoBehaviour, IPunObservable
 
     #region BET
 
-    public void AddChipsToBet(PlayerInventory playerInventory, string chipId)
+    public void AddChipToBet(PlayerInventory playerInventory, string chipId)
     {
         if (PhotonNetwork.IsMasterClient)
         {
-            var totalBetIncrements = AddChipsOnMaster(playerInventory.UserId, chipId);
+            var totalBetIncrements = AddChipOnMaster(playerInventory.UserId, chipId);
             OnBetQuantityChanged?.Invoke(playerInventory.UserId, chipId, totalBetIncrements);
 
             myPhotonView?.RPC("RPC_OnBetQuantityChanged_Client", RpcTarget.Others, playerInventory.UserId, chipId, totalBetIncrements);
         }
         else
         {
-            myPhotonView?.RPC("RPC_AddChipsToBet_Master", RpcTarget.MasterClient, playerInventory.UserId, chipId);
+            myPhotonView?.RPC("RPC_AddChipToBet_Master", RpcTarget.MasterClient, playerInventory.UserId, chipId);
         }
 
     }
 
-    private int AddChipsOnMaster(string userId, string chipId)
+    private int AddChipOnMaster(string userId, string chipId)
     {
         var playerBetData = GetPlayerBetData(userId);
-        if (!playerBetData.BetTokensCount.ContainsKey(chipId))
-        {
-            playerBetData.BetTokensCount[chipId] = 0;
-        }
 
-        var currentBet = playerBetData.BetTokensCount[chipId] * S_BET_INCREMENTS;
+        var currentBet = playerBetData.GetChipCount(chipId);
         if (m_gameManager.GetInventory(m_gameManager.GetCurrentInventory().UserId).CanBetMore(chipId, currentBet))
         {
-            playerBetData.BetTokensCount[chipId]++;
+            playerBetData.AddChip(chipId);
         }
 
-        return playerBetData.BetTokensCount[chipId];
+        return playerBetData.GetChipCount(chipId);
     }
 
     [PunRPC]
-    private void RPC_AddChipsToBet_Master(string userId, string chipId)
+    private void RPC_AddChipToBet_Master(string userId, string chipId)
     {
         if (PhotonNetwork.IsMasterClient)
         {
             var inventory = m_gameManager.GetInventory(userId);
-            AddChipsToBet(inventory, chipId);
+            AddChipToBet(inventory, chipId);
         }
     }
 
 
-    public void RemoveChipsFromBet(PlayerInventory playerInventory, string chipId)
+    public void RemoveChipFromBet(PlayerInventory playerInventory, string chipId)
     {
         if (PhotonNetwork.IsMasterClient)
         {
             //remove chips and notify client of new quantity
-            int totalBetIncrements = RemoveChipsOnMaster(playerInventory.UserId, chipId);
-            OnBetQuantityChanged?.Invoke(playerInventory.UserId, chipId, totalBetIncrements);
-            myPhotonView?.RPC("RPC_OnBetQuantityChanged_Client", RpcTarget.Others, playerInventory.UserId, chipId, totalBetIncrements);
+            int totalBetCount = RemoveChipOnMaster(playerInventory.UserId, chipId);
+            OnBetQuantityChanged?.Invoke(playerInventory.UserId, chipId, totalBetCount);
+            myPhotonView?.RPC("RPC_OnBetQuantityChanged_Client", RpcTarget.Others, playerInventory.UserId, chipId, totalBetCount);
         }
         else
         {
-            myPhotonView?.RPC("RPC_RemoveChipsFromBet_Master", RpcTarget.MasterClient, playerInventory.UserId, chipId);
+            myPhotonView?.RPC("RPC_RemoveChipFromBet_Master", RpcTarget.MasterClient, playerInventory.UserId, chipId);
         }
     }
 
-    private int RemoveChipsOnMaster(string userId, string chipId)
+    private int RemoveChipOnMaster(string userId, string chipId)
     {
         var playerBetData = GetPlayerBetData(userId);
-        if (!playerBetData.BetTokensCount.ContainsKey(chipId) || playerBetData.BetTokensCount[chipId] == 0)
-            return 0;
-
-        playerBetData.BetTokensCount[chipId]--;
-        return playerBetData.BetTokensCount[chipId];
+        playerBetData.RemoveChip(chipId);
+        return playerBetData.GetChipCount(chipId);
     }
 
     [PunRPC]
-    private void RPC_RemoveChipsFromBet_Master(string userId, string chipId)
+    private void RPC_RemoveChipFromBet_Master(string userId, string chipId)
     {
         if (PhotonNetwork.IsMasterClient)
         {
             var inventory = m_gameManager.GetInventory(userId);
-            RemoveChipsFromBet(inventory, chipId);
+            RemoveChipFromBet(inventory, chipId);
         }
     }
 
     //from Master to client when the bet quantity has changed
     [PunRPC]
-    private void RPC_OnBetQuantityChanged_Client(string userId, string chipId, int totalBetIncrements)
+    private void RPC_OnBetQuantityChanged_Client(string userId, string chipId, int totalBet)
     {
-        OnBetQuantityChanged?.Invoke(userId, chipId, totalBetIncrements);
+        OnBetQuantityChanged?.Invoke(userId, chipId, totalBet);
     }
 
     #endregion
@@ -195,7 +186,7 @@ public class BetManager : MonoBehaviour, IPunObservable
             {
                 bool win = m_currentBetResultColor == bet.ColorBet;
 
-                m_gameManager.ConfirmBet_Master(bet.UserId, playerBetData.BetTokensCount, win);
+                m_gameManager.ConfirmBet_Master(bet.UserId, playerBetData.BetChipsCount, win);
                 Debug.LogError("Bet " + bet.ColorBet + " for " + userId + " : " + win);
 
                 if (bet.UserId == m_gameManager.GetLocalPlayerId())
@@ -261,25 +252,57 @@ public class BetManager : MonoBehaviour, IPunObservable
     {
         public string UserId;
         public EColor ColorBet;
-        public Dictionary<string, int> BetTokensCount = new Dictionary<string, int>();
+        public Dictionary<string, int> BetChipsCount = new Dictionary<string, int>();
         public bool BetConfirmed = false;
+
+        private int m_totalBetChipsCount = 0;
 
         public PlayerBetData(string userId)
         {
             UserId = userId;
         }
 
+        public int GetChipCount(string chipId)
+        {
+            if (!BetChipsCount.ContainsKey(chipId))
+            {
+                return 0;
+            }
+            return BetChipsCount[chipId];
+        }
+
+        public void AddChip(string chipId)
+        {
+            if (!BetChipsCount.ContainsKey(chipId))
+            {
+                BetChipsCount[chipId] = 0;
+            }
+
+            BetChipsCount[chipId]++;
+            m_totalBetChipsCount++;
+        }
+
+        public void RemoveChip(string chipId)
+        {
+            if (!BetChipsCount.ContainsKey(chipId) || BetChipsCount[chipId] == 0)
+                return;
+
+            BetChipsCount[chipId]--;
+            m_totalBetChipsCount--;
+        }
+
         public void Clear()
         {
             ColorBet = EColor.NONE;
-            BetTokensCount.Clear();
+            BetChipsCount.Clear();
             BetConfirmed = false;
+            m_totalBetChipsCount = 0;
         }
 
         public bool IsBetValid()
         {
             bool hasAtLeastOneBetToken = false;
-            foreach (var token in BetTokensCount)
+            foreach (var token in BetChipsCount)
             {
                 if (token.Value > 0)
                 {
