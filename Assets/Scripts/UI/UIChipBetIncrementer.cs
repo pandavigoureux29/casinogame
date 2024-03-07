@@ -5,7 +5,7 @@ using Unity.VisualScripting.Antlr3.Runtime;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UIToken : MonoBehaviour
+public class UIChipBetIncrementer : MonoBehaviour
 {
     [SerializeField]
     private TextMeshProUGUI m_quantityText;
@@ -15,7 +15,7 @@ public class UIToken : MonoBehaviour
     [SerializeField]
     private Button m_buttonRemove;
 
-    private UITokenInventory m_uiTokenInventory;
+    private UIIncrementers m_uiTokenInventory;
     private ChipData m_chipData;
     public ChipData Token => m_chipData;
 
@@ -24,7 +24,7 @@ public class UIToken : MonoBehaviour
 
     private int m_betIncrements = 0;
 
-    public void InitializeToken(UITokenInventory inventory, ChipStack stack)
+    public void InitializeToken(UIIncrementers inventory, ChipStack stack)
     {
         m_uiTokenInventory = inventory;
         m_id = stack.ChipData.Id;

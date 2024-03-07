@@ -87,7 +87,7 @@ public class ChipStacksHubManager : MonoBehaviour
         m_inventoryStacksMap[userId].RefreshChips(chipData, currentQuantity - totalBetChipsCount);
     }
 
-    private void OnBetConfirmed(bool win)
+    private void OnBetConfirmed(bool win, BetManager.EColor betcolor)
     {
         foreach(var betStack in m_betStacksMap.Values)
         {

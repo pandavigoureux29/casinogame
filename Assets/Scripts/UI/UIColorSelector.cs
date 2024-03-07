@@ -15,7 +15,7 @@ public class UIColorSelector : MonoBehaviour
     private Button m_button;
 
     [SerializeField]
-    private UITokenInventory m_tokenInventory;
+    private UIIncrementers m_tokenInventory;
 
     private int m_currentColorDataIndex;
 

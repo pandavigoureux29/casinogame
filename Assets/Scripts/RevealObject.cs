@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ReversableChip : MonoBehaviour
+public class RevealObject : MonoBehaviour
 {
     [SerializeField]
     private MeshRenderer m_quadRenderer;
@@ -26,9 +26,6 @@ public class ReversableChip : MonoBehaviour
     private BetManager.EColor m_color;
     public BetManager.EColor Color => m_color;
 
-    private bool m_isFlipped;
-    public bool IsFlipped => m_isFlipped;
-
     public void SetColor(BetManager.EColor color)
     {
         m_color = color;
@@ -44,13 +41,6 @@ public class ReversableChip : MonoBehaviour
 
     public void Flip()
     {
-        m_isFlipped = true;
         m_animator.SetTrigger("Flip");
-    }
-
-    public void Unflip()
-    {
-        m_isFlipped = false;
-        m_animator.SetTrigger("Unflip");
     }
 }

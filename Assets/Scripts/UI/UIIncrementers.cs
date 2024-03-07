@@ -4,16 +4,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UITokenInventory : MonoBehaviour
+public class UIIncrementers : MonoBehaviour
 {
-    List<UIToken> m_tokens;
-
     [SerializeField]
     ChipStacksHubManager m_hubManager;
     [SerializeField]
     private GameManager m_gameManager;
     [SerializeField]
-    private UIToken m_tokenPrefab;
+    private UIChipBetIncrementer m_uiIncrementerPrefab;
 
     [SerializeField]
     private bool m_isLocal;
@@ -23,7 +21,7 @@ public class UITokenInventory : MonoBehaviour
 
     private ChipStacksManager m_stacksManager;
 
-    private List<UIToken> m_uiTokens = new List<UIToken>();
+    private List<UIChipBetIncrementer> m_uiIncrementers = new List<UIChipBetIncrementer>();
     private Dictionary<string, int> m_betTokensCount = new Dictionary<string, int>();
 
     private void Awake()
@@ -49,15 +47,15 @@ public class UITokenInventory : MonoBehaviour
         m_stacksManager = manager;
         foreach (var stack in m_stacksManager.Stacks)
         {
-            var go = Instantiate(m_tokenPrefab, transform);
-            var uiToken = go.GetComponent<UIToken>();
+            var go = Instantiate(m_uiIncrementerPrefab, transform);
+            var uiToken = go.GetComponent<UIChipBetIncrementer>();
             uiToken.InitializeToken(this, stack.Value);
-            m_uiTokens.Add(uiToken);
+            m_uiIncrementers.Add(uiToken);
         }
         m_hubManager.OnInitialized -= OnStacksInitialized;
     }
 
-    public void OnAddBetStacked(UIToken token, bool sendEvent=true)
+    public void OnAddBetStacked(UIChipBetIncrementer token, bool sendEvent=true)
     {
         if(!m_betTokensCount.ContainsKey(token.Id))
         {
@@ -72,7 +70,7 @@ public class UITokenInventory : MonoBehaviour
         UpdateBetButton();
     }
 
-    public void OnRemoveBetStacked(UIToken token, bool sendEvent = true)
+    public void OnRemoveBetStacked(UIChipBetIncrementer token, bool sendEvent = true)
     {
         if (m_betTokensCount.ContainsKey(token.Id))
         {
@@ -97,14 +95,14 @@ public class UITokenInventory : MonoBehaviour
             return;
         }
 
-        var uiToken = m_uiTokens.Find(x => x.Id == tokenId);
+        var uiToken = m_uiIncrementers.Find(x => x.Id == tokenId);
         if (uiToken != null)
         {
             uiToken.UpdateIncrement(totalBetIncrements);
         }
     }
 
-    private void OnBetConfirmed(bool isBetWon)
+    private void OnBetConfirmed(bool isBetWon, BetManager.EColor color)
     {
         m_betTokensCount.Clear();
         UpdateBetButton();
@@ -114,7 +112,7 @@ public class UITokenInventory : MonoBehaviour
     {
         if(inventory == m_stacksManager.Inventory)
         {
-            foreach (var uiToken in m_uiTokens)
+            foreach (var uiToken in m_uiIncrementers)
             {
                 uiToken.ClearBetStacks();
                 uiToken.UpdateQuantity();
@@ -126,7 +124,7 @@ public class UITokenInventory : MonoBehaviour
     {
         bool toggle = m_stacksManager.Inventory.UserId == userId;
 
-        foreach (var uiToken in m_uiTokens)
+        foreach (var uiToken in m_uiIncrementers)
         {
             uiToken.Toggle(toggle);
         }

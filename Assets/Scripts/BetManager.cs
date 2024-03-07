@@ -17,7 +17,7 @@ public class BetManager : MonoBehaviour, IPunObservable
 
 
     public Action<string, string, int> OnBetQuantityChanged;
-    public Action<bool> OnBetConfirmed;
+    public Action<bool,EColor> OnBetConfirmed;
 
     private PhotonView myPhotonView;
 
@@ -200,12 +200,12 @@ public class BetManager : MonoBehaviour, IPunObservable
 
                 if (bet.UserId == m_gameManager.GetLocalPlayerId())
                 {
-                    OnBetConfirmed?.Invoke(win);
+                    OnBetConfirmed?.Invoke(win, m_currentBetResultColor);
                 }
                 else
                 {
                     //notify client that the bet is done
-                    myPhotonView?.RPC("RPC_ConfirmBet", RpcTarget.Others, bet.UserId, win);
+                    myPhotonView?.RPC("RPC_ConfirmBet", RpcTarget.Others, bet.UserId, win, (int)m_currentBetResultColor);
                 }
 
                 bet.Clear();
@@ -231,12 +231,13 @@ public class BetManager : MonoBehaviour, IPunObservable
 
     //From master to client to confirm the bet and update values
     [PunRPC]
-    public void RPC_ConfirmBet(string userId, bool isBetWon)
+    public void RPC_ConfirmBet(string userId, bool isBetWon, int colorInt)
     {
         //m_gameManager.ConfirmBet_Master(userId, isBetWon);
         if(userId == m_gameManager.GetLocalPlayerId())
         {
-            OnBetConfirmed?.Invoke(isBetWon);
+            EColor betColor = (EColor)colorInt;
+            OnBetConfirmed?.Invoke(isBetWon, betColor);
         }
     }
 
