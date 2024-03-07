@@ -18,7 +18,7 @@ public class UITokenBetStack : MonoBehaviour
     public void AddToken(UIToken uiToken)
     {
         Image tokenImage = TakeTokenFromPool();
-        tokenImage.color = uiToken.Token.Color;
+        //tokenImage.color = uiToken.Token.Color;
         tokenImage.gameObject.SetActive(true);
 
         if(!m_tokens.ContainsKey(uiToken.Id))

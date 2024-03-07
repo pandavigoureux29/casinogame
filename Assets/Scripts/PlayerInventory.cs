@@ -18,12 +18,12 @@ public class PlayerInventory
     {
         m_userId = userId;
         m_inventory = playerInventorySO;
-        m_totalTokensCount = playerInventorySO.tokens.Sum(x=> x.Quantity);
+        m_totalTokensCount = playerInventorySO.Chips.Sum(x=> x.Quantity);
     }
 
     public int GetQuantity(string tokenId)
     {
-        var token = m_inventory.tokens.FirstOrDefault(x => x.Id == tokenId);
+        var token = m_inventory.Chips.FirstOrDefault(x => x.Id == tokenId);
         if (token == null)
             return 0;
         return token.Quantity;
@@ -38,7 +38,7 @@ public class PlayerInventory
     {
         foreach (var tokenStackCount in m_betTokensCount)
         {
-            var token = m_inventory.tokens.FirstOrDefault(x=>x.Id == tokenStackCount.Key);
+            var token = m_inventory.Chips.FirstOrDefault(x=>x.Id == tokenStackCount.Key);
             if(token == null)
                 continue;
 
@@ -56,7 +56,7 @@ public class PlayerInventory
         keys = new List<string>();
         values = new List<int>();
 
-        foreach (var token in m_inventory.tokens)
+        foreach (var token in m_inventory.Chips)
         {
             keys.Add(token.Id);
             values.Add(token.Quantity);
@@ -68,7 +68,7 @@ public class PlayerInventory
         for(int i = 0; i < keys.Length; i++)
         {
             var tokenkey = keys[i];
-            var token = m_inventory.tokens.FirstOrDefault(x => x.Id == tokenkey);
+            var token = m_inventory.Chips.FirstOrDefault(x => x.Id == tokenkey);
             if(token != null)
             {
                 int lastvalue = token.Quantity;
@@ -82,10 +82,10 @@ public class PlayerInventory
     public void Reset(PlayerInventorySO playerInventorySO)
     {
         m_totalTokensCount = 0;
-        for(int i=0; i < playerInventorySO.tokens.Count; i++)
+        for(int i=0; i < playerInventorySO.Chips.Count; i++)
         {
-            m_inventory.tokens[i].Quantity = playerInventorySO.tokens[i].Quantity;
-            m_totalTokensCount += m_inventory.tokens[i].Quantity;
+            m_inventory.Chips[i].Quantity = playerInventorySO.Chips[i].Quantity;
+            m_totalTokensCount += m_inventory.Chips[i].Quantity;
         }
     }
 }

@@ -17,19 +17,18 @@ public class UIToken : MonoBehaviour
     private GameObject m_buttonsContainer;
 
     private UITokenInventory m_uiTokenInventory;
-    private Token m_token;
-    public Token Token => m_token;
+    private ChipData m_token;
+    public ChipData Token => m_token;
 
     private string m_id;
     public string Id => m_id;
 
     private int m_betStacks = 0;
 
-    public void InitializeToken(UITokenInventory inventory, Token token)
+    public void InitializeToken(UITokenInventory inventory, ChipData token)
     {
         m_uiTokenInventory = inventory;
         m_id = token.Id;
-        m_image.color = token.Color;
         UpdateQuantity(token.Quantity);
         m_token = token;
     }

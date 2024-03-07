@@ -15,9 +15,8 @@ The GameManager on the MasterClient ensures the players cannot bet more than the
 
 Flow:
 1. Player adds/remove Tokens that they wanna be (AddTokenToBet/RemoveTokenFromBet in BetManager)
-2. They select a chip to bet on (SelectChip in GameManager)
-3. Select the color you wanna bet on (ChangeBetColor in BetManager)
-4. Click on BET !! and set if you won (DeclareBet in BetManager)
+2. Select the color you wanna bet on (ChangeBetColor in BetManager)
+3. Click on BET !! and set if you won (DeclareBet in BetManager)
 
 When all chips on the board have been flipped, the colors are regenerated on MasterClient and we unlfip every chip
 Player that has no token left gets their inventory refilled with initial values.

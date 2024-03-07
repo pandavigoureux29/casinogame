@@ -56,7 +56,7 @@ public class UITokenInventory : MonoBehaviour
             return;
         }
 
-        foreach (var token in m_inventory.Inventory.tokens)
+        foreach (var token in m_inventory.Inventory.Chips)
         {
             var go = Instantiate(m_tokenPrefab, transform);
             var uiToken = go.GetComponent<UIToken>();

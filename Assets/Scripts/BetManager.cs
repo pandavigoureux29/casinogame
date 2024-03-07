@@ -163,13 +163,11 @@ public class BetManager : MonoBehaviour, IPunObservable
             {
                 m_confirmedBetsCount++;
                 playerBetData.BetConfirmed = true;
-                Debug.LogError("Bet is valid for " + userId);
             }
 
             //check if all bets have been set and declared
             if(m_confirmedBetsCount < m_playersBetData.Count)
             {
-                Debug.LogError("Still waiting for more bets");
                 return;
             }
 

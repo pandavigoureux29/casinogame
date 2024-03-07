@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [Serializable]
-public class Token
+public class ChipData
 {
     public string Id;
     public int Quantity;
-    public Color Color;
+    public Material Material;
 }
