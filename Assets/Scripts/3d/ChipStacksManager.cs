@@ -14,11 +14,14 @@ public class ChipStacksManager : MonoBehaviour
 
     private Dictionary<string,ChipStack> m_stacks = new Dictionary<string, ChipStack>();
 
-
     private PlayerInventory m_inventory;
 
-    public void Initialize()
+    public void Initialize(PlayerInventorySO playerInventorySO)
     {
+        foreach (var chip in playerInventorySO.Chips)
+        {
+            GetStack(chip.Id).Refresh(chip, 0);
+        }
     }
 
     public void Initialize(PlayerInventory inventory)
@@ -29,10 +32,14 @@ public class ChipStacksManager : MonoBehaviour
 
     public void AddChips(ChipData chipData, int quantity)
     {
-        string id = m_isFlexible ? chipData.Id : "chip";
-        ChipStack stack = GetStack(id);
-
+        ChipStack stack = GetStack(chipData.Id);
         stack.AddChips(chipData, quantity);
+    }
+
+    public void RemoveChips(ChipData chipData, int quantity)
+    {
+        ChipStack stack = GetStack(chipData.Id);
+        stack.RemoveChips(chipData, quantity);
     }
 
     private void PlaceStack(ChipStack stack)

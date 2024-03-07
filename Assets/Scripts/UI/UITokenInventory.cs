@@ -30,8 +30,8 @@ public class UITokenInventory : MonoBehaviour
     private void Awake()
     {
         m_gameManager.OnInventoriesInitialized += OnInventoriesInitialized;
-        m_gameManager.BetManager.OnAddTokenToBet += OnAddBetEvent;
-        m_gameManager.BetManager.OnRemoveTokenFromBet += OnRemoveBetEvent;
+        m_gameManager.BetManager.OnAddChipsToBet += OnAddBetEvent;
+        m_gameManager.BetManager.OnRemoveChipsFromBet += OnRemoveBetEvent;
         m_gameManager.BetManager.OnBetConfirmed += OnBetConfirmed;
         m_gameManager.OnInventoryUpdated += OnInventoryUpdated;
     }
@@ -40,8 +40,8 @@ public class UITokenInventory : MonoBehaviour
     {
         if (m_gameManager != null)
         {
-            m_gameManager.BetManager.OnAddTokenToBet -= OnAddBetEvent;
-            m_gameManager.BetManager.OnRemoveTokenFromBet -= OnRemoveBetEvent;
+            m_gameManager.BetManager.OnAddChipsToBet -= OnAddBetEvent;
+            m_gameManager.BetManager.OnRemoveChipsFromBet -= OnRemoveBetEvent;
             m_gameManager.BetManager.OnBetConfirmed -= OnBetConfirmed;
             m_gameManager.OnInventoryUpdated -= OnInventoryUpdated;
         }
@@ -111,9 +111,9 @@ public class UITokenInventory : MonoBehaviour
     }
 
     //from rpc
-    private void OnAddBetEvent(string userId, string tokenId)
+    private void OnAddBetEvent(string userId, string tokenId, int quantity)
     {
-        if(m_inventory.UserId != userId)
+        if(m_inventory == null || m_inventory.UserId != userId)
         {
             return;
         }
@@ -126,9 +126,9 @@ public class UITokenInventory : MonoBehaviour
         }
     }
 
-    private void OnRemoveBetEvent(string userId, string tokenId)
+    private void OnRemoveBetEvent(string userId, string tokenId, int quantity)
     {
-        if (m_inventory.UserId != userId)
+        if (m_inventory != null && m_inventory.UserId != userId)
         {
             return;
         }

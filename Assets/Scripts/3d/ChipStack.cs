@@ -45,16 +45,16 @@ public class ChipStack : MonoBehaviour
         }
     }
 
-    public void RemoveChip(ChipData chipData, int quantity)
+    public void RemoveChips(ChipData chipData, int quantity)
     {
         for (int i = 0; i < quantity; i++)
         {
             var list = m_chips[chipData.Id];
-            var chip = list.LastOrDefault();
-            if(chip != null)
+            var tokenImage = list.LastOrDefault();
+            if(tokenImage != null)
             {
-                list.Remove(chip);
-                ReleaseToPool(chip);
+                list.Remove(tokenImage);
+                ReleaseToPool(tokenImage);
 
                 m_totalChipsCount--;
             }

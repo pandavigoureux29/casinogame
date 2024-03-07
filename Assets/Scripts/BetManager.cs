@@ -16,8 +16,8 @@ public class BetManager : MonoBehaviour, IPunObservable
     private GameManager m_gameManager;
 
 
-    public Action<string, string> OnAddTokenToBet;
-    public Action<string, string> OnRemoveTokenFromBet;
+    public Action<string,string, int> OnAddChipsToBet;
+    public Action<string,string, int> OnRemoveChipsFromBet;
     public Action<bool> OnBetConfirmed;
 
     private PhotonView myPhotonView;
@@ -67,6 +67,8 @@ public class BetManager : MonoBehaviour, IPunObservable
             AddTokenOnMaster(playerInventory.UserId, tokenId);
         }
 
+        OnAddChipsToBet?.Invoke(playerInventory.UserId, tokenId, S_BET_INCREMENTS);
+
         myPhotonView?.RPC("RPC_AddTokenToBet", RpcTarget.Others, playerInventory.UserId, tokenId);
     }
 
@@ -93,7 +95,7 @@ public class BetManager : MonoBehaviour, IPunObservable
             AddTokenOnMaster(userId, tokenId);
         }
 
-        OnAddTokenToBet?.Invoke(userId, tokenId);
+        OnAddChipsToBet?.Invoke(userId, tokenId, S_BET_INCREMENTS);
     }
 
     private void RemoveTokenOnMaster(string userId, string tokenId)
@@ -109,9 +111,10 @@ public class BetManager : MonoBehaviour, IPunObservable
     {
         if (PhotonNetwork.IsMasterClient)
         {
-            RemoveTokenOnMaster(playerInventory.UserId, tokenId);   
+            RemoveTokenOnMaster(playerInventory.UserId, tokenId);
         }
 
+        OnRemoveChipsFromBet?.Invoke(playerInventory.UserId, tokenId, S_BET_INCREMENTS);
         myPhotonView?.RPC("RPC_RemoveTokenFromBet", RpcTarget.Others, playerInventory.UserId, tokenId);
     }
 
@@ -123,7 +126,7 @@ public class BetManager : MonoBehaviour, IPunObservable
             RemoveTokenOnMaster(userId, tokenId);
         }
 
-        OnRemoveTokenFromBet?.Invoke(userId, tokenId);
+        OnRemoveChipsFromBet?.Invoke(userId, tokenId, S_BET_INCREMENTS);
     }
 
     #endregion
