@@ -29,7 +29,7 @@ public class UIIncrementers : MonoBehaviour
         m_hubManager.OnInitialized += OnStacksInitialized;
         m_gameManager.BetManager.OnBetConfirmed += OnBetConfirmed;
         m_gameManager.OnInventoryUpdated += OnInventoryUpdated;
-        m_gameManager.BetManager.OnBetQuantityChanged += OnBetQuantityChanged;
+        m_gameManager.BetManager.OnBetChipQuantityChanged += OnBetQuantityChanged;
     }
 
     private void OnDestroy()
@@ -38,7 +38,7 @@ public class UIIncrementers : MonoBehaviour
         {
             m_gameManager.BetManager.OnBetConfirmed -= OnBetConfirmed;
             m_gameManager.OnInventoryUpdated -= OnInventoryUpdated;
-            m_gameManager.BetManager.OnBetQuantityChanged -= OnBetQuantityChanged;
+            m_gameManager.BetManager.OnBetChipQuantityChanged -= OnBetQuantityChanged;
         }
     }
 

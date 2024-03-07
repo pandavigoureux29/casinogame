@@ -10,11 +10,12 @@ public class BetManager : MonoBehaviour, IPunObservable
 {
     public enum EColor {NONE, GREEN, RED }
 
+    private static int S_MAXIMUM_BET_COUNT = 10;
+
     [SerializeField]
     private GameManager m_gameManager;
 
-
-    public Action<string, string, int> OnBetQuantityChanged;
+    public Action<string, string, int> OnBetChipQuantityChanged;
     public Action<bool,EColor> OnBetConfirmed;
 
     private PhotonView myPhotonView;
@@ -61,29 +62,29 @@ public class BetManager : MonoBehaviour, IPunObservable
     {
         if (PhotonNetwork.IsMasterClient)
         {
-            var totalBetIncrements = AddChipOnMaster(playerInventory.UserId, chipId);
-            OnBetQuantityChanged?.Invoke(playerInventory.UserId, chipId, totalBetIncrements);
+            var playerBetData = GetPlayerBetData(playerInventory.UserId);
 
-            myPhotonView?.RPC("RPC_OnBetQuantityChanged_Client", RpcTarget.Others, playerInventory.UserId, chipId, totalBetIncrements);
+            if(playerBetData.TotalBetChipsCount >= S_MAXIMUM_BET_COUNT)
+            {
+                return;
+            }
+
+            var currentBet = playerBetData.GetChipCount(chipId);
+            if (m_gameManager.GetInventory(m_gameManager.GetCurrentInventory().UserId).CanBetMore(chipId, currentBet))
+            {
+                playerBetData.AddChip(chipId);
+            }
+
+            var totalBetCount = playerBetData.GetChipCount(chipId);
+            OnBetChipQuantityChanged?.Invoke(playerInventory.UserId, chipId, totalBetCount);
+
+            myPhotonView?.RPC("RPC_OnBetQuantityChanged_Client", RpcTarget.Others, playerInventory.UserId, chipId, totalBetCount);
         }
         else
         {
             myPhotonView?.RPC("RPC_AddChipToBet_Master", RpcTarget.MasterClient, playerInventory.UserId, chipId);
         }
 
-    }
-
-    private int AddChipOnMaster(string userId, string chipId)
-    {
-        var playerBetData = GetPlayerBetData(userId);
-
-        var currentBet = playerBetData.GetChipCount(chipId);
-        if (m_gameManager.GetInventory(m_gameManager.GetCurrentInventory().UserId).CanBetMore(chipId, currentBet))
-        {
-            playerBetData.AddChip(chipId);
-        }
-
-        return playerBetData.GetChipCount(chipId);
     }
 
     [PunRPC]
@@ -103,7 +104,7 @@ public class BetManager : MonoBehaviour, IPunObservable
         {
             //remove chips and notify client of new quantity
             int totalBetCount = RemoveChipOnMaster(playerInventory.UserId, chipId);
-            OnBetQuantityChanged?.Invoke(playerInventory.UserId, chipId, totalBetCount);
+            OnBetChipQuantityChanged?.Invoke(playerInventory.UserId, chipId, totalBetCount);
             myPhotonView?.RPC("RPC_OnBetQuantityChanged_Client", RpcTarget.Others, playerInventory.UserId, chipId, totalBetCount);
         }
         else
@@ -133,7 +134,7 @@ public class BetManager : MonoBehaviour, IPunObservable
     [PunRPC]
     private void RPC_OnBetQuantityChanged_Client(string userId, string chipId, int totalBet)
     {
-        OnBetQuantityChanged?.Invoke(userId, chipId, totalBet);
+        OnBetChipQuantityChanged?.Invoke(userId, chipId, totalBet);
     }
 
     #endregion
@@ -256,6 +257,7 @@ public class BetManager : MonoBehaviour, IPunObservable
         public bool BetConfirmed = false;
 
         private int m_totalBetChipsCount = 0;
+        public int TotalBetChipsCount => m_totalBetChipsCount;
 
         public PlayerBetData(string userId)
         {

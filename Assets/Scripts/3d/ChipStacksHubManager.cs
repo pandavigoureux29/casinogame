@@ -30,7 +30,7 @@ public class ChipStacksHubManager : MonoBehaviour
     {
         m_gameManager.OnInventoriesInitialized += OnInventoriesInitialized;
         m_gameManager.OnInventoryUpdated += OnInventoryUpdated;
-        m_gameManager.BetManager.OnBetQuantityChanged += OnBetQuantityChanged;
+        m_gameManager.BetManager.OnBetChipQuantityChanged += OnBetQuantityChanged;
         m_gameManager.BetManager.OnBetConfirmed += OnBetConfirmed;
     }
 
@@ -42,7 +42,7 @@ public class ChipStacksHubManager : MonoBehaviour
             m_gameManager.OnInventoryUpdated -= OnInventoryUpdated;
             if(m_gameManager.BetManager != null)
             {
-                m_gameManager.BetManager.OnBetQuantityChanged -= OnBetQuantityChanged;
+                m_gameManager.BetManager.OnBetChipQuantityChanged -= OnBetQuantityChanged;
                 m_gameManager.BetManager.OnBetConfirmed -= OnBetConfirmed;
             }
         }
