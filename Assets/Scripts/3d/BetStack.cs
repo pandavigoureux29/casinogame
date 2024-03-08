@@ -4,9 +4,6 @@ using UnityEngine;
 
 public class BetStack : ChipStack
 {
-    [SerializeField]
-    private PlayerInventorySO m_inventorySO;
-
     public override void Refresh(ChipData chipData, int quantity)
     {
         if(m_chips.Count <= 0)

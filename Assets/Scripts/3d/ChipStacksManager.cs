@@ -16,14 +16,6 @@ public class ChipStacksManager : MonoBehaviour
     private PlayerInventory m_inventory;
     public PlayerInventory Inventory => m_inventory;
 
-    public void Initialize(PlayerInventorySO playerInventorySO)
-    {
-        foreach (var chip in playerInventorySO.Chips)
-        {
-            GetStack(chip.Id).Refresh(chip, 0);
-        }
-    }
-
     public void Initialize(PlayerInventory inventory)
     {
         m_inventory = inventory;

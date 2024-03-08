@@ -18,9 +18,6 @@ public class ChipStacksHubManager : MonoBehaviour
     [SerializeField]
     private BetStack m_otherBetStack;
 
-    [SerializeField]
-    PlayerInventorySO m_inventorySO;
-
     private Dictionary<string, ChipStacksManager> m_inventoryStacksMap;
     private Dictionary<string, BetStack> m_betStacksMap;
 
@@ -75,7 +72,7 @@ public class ChipStacksHubManager : MonoBehaviour
 
     private void OnBetQuantityChanged(string userId, string chipId, int totalBetCount)
     {
-        var chipData = m_inventorySO.GetChipData(chipId);
+        var chipData = m_gameManager.GetChipData(chipId);
         var inventory = m_gameManager.GetInventory(userId);
         int currentQuantity = inventory.GetQuantity(chipId);
 
