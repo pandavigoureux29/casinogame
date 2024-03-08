@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using static UIColorSelector;
 
 public class UIColorSelector : MonoBehaviour
 {
@@ -33,6 +34,7 @@ public class UIColorSelector : MonoBehaviour
             m_currentColorDataIndex = 0;
         }
         RefreshColor();
+        m_betManager.ChangeBetColor(m_colorsData[m_currentColorDataIndex].ColorEnum);
     }
 
     private void RefreshColor()
@@ -42,8 +44,6 @@ public class UIColorSelector : MonoBehaviour
         colors.normalColor = colorData.Color;
         colors.selectedColor = colorData.Color;
         m_button.colors = colors;
-
-        m_betManager.ChangeBetColor(colorData.ColorEnum);
     }
 
     [Serializable]

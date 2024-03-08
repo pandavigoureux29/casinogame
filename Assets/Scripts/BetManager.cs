@@ -155,7 +155,6 @@ public class BetManager : MonoBehaviour, IPunObservable
 
     public void OnDeclareBet()
     {
-        Debug.LogError("Player : " + m_gameManager.GetLocalPlayerId());
         DeclareBet(m_gameManager.GetLocalPlayerId(), m_currentSelectedLocalColor);
     }
 
@@ -224,6 +223,7 @@ public class BetManager : MonoBehaviour, IPunObservable
 
             GenerateColorResult();
             m_confirmedBetsCount = 0;
+            m_currentSelectedLocalColor = EColor.NONE;
         }
         else
         {
@@ -254,6 +254,7 @@ public class BetManager : MonoBehaviour, IPunObservable
         //m_gameManager.ConfirmBet_Master(userId, isBetWon);
         if(userId == m_gameManager.GetLocalPlayerId())
         {
+            m_currentSelectedLocalColor = EColor.NONE;
             EColor betColor = (EColor)colorInt;
             OnBetConfirmed?.Invoke(isBetWon, betColor);
         }
