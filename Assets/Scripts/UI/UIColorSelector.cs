@@ -44,8 +44,6 @@ public class UIColorSelector : MonoBehaviour
         m_button.colors = colors;
 
         m_betManager.ChangeBetColor(colorData.ColorEnum);
-
-        m_tokenInventory.UpdateBetButton();
     }
 
     [Serializable]

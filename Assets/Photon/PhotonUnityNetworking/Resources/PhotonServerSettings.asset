@@ -57,6 +57,7 @@ MonoBehaviour:
   - RPC_RemoveChipsFromBet_Master
   - RPC_AddChipToBet_Master
   - RPC_RemoveChipFromBet_Master
+  - RPC_DeclareBet_Validated
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1

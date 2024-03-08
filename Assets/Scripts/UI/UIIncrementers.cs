@@ -1,4 +1,5 @@
 using Newtonsoft.Json.Bson;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -16,20 +17,21 @@ public class UIIncrementers : MonoBehaviour
     [SerializeField]
     private bool m_isLocal;
 
-    [SerializeField]
-    private Button m_betButton;
-
     private ChipStacksManager m_stacksManager;
 
     private List<UIChipBetIncrementer> m_uiIncrementers = new List<UIChipBetIncrementer>();
-    private Dictionary<string, int> m_betTokensCount = new Dictionary<string, int>();
+    private Dictionary<string, int> m_betChipsCount = new Dictionary<string, int>();
+
+    public bool HasAddedChips => m_betChipsCount.Count > 0;
+
+    public Action OnBetQuantityChanged;
 
     private void Awake()
     {
         m_hubManager.OnInitialized += OnStacksInitialized;
         m_gameManager.BetManager.OnBetConfirmed += OnBetConfirmed;
         m_gameManager.OnInventoryUpdated += OnInventoryUpdated;
-        m_gameManager.BetManager.OnBetChipQuantityChanged += OnBetQuantityChanged;
+        m_gameManager.BetManager.OnBetChipQuantityChanged += OnBetChipQuantityChanged;
     }
 
     private void OnDestroy()
@@ -38,7 +40,7 @@ public class UIIncrementers : MonoBehaviour
         {
             m_gameManager.BetManager.OnBetConfirmed -= OnBetConfirmed;
             m_gameManager.OnInventoryUpdated -= OnInventoryUpdated;
-            m_gameManager.BetManager.OnBetChipQuantityChanged -= OnBetQuantityChanged;
+            m_gameManager.BetManager.OnBetChipQuantityChanged -= OnBetChipQuantityChanged;
         }
     }
 
@@ -57,38 +59,36 @@ public class UIIncrementers : MonoBehaviour
 
     public void OnAddBetStacked(UIChipBetIncrementer token, bool sendEvent=true)
     {
-        if(!m_betTokensCount.ContainsKey(token.Id))
+        if(!m_betChipsCount.ContainsKey(token.Id))
         {
-            m_betTokensCount[token.Id] = 0;
+            m_betChipsCount[token.Id] = 0;
         }
-        m_betTokensCount[token.Id]++;
+        m_betChipsCount[token.Id]++;
+        OnBetQuantityChanged?.Invoke();
 
         //send to network
         if(sendEvent)
             m_gameManager.BetManager.AddChipToBet(m_stacksManager.Inventory, token.Id);
-
-        UpdateBetButton();
     }
 
     public void OnRemoveBetStacked(UIChipBetIncrementer token, bool sendEvent = true)
     {
-        if (m_betTokensCount.ContainsKey(token.Id))
+        if (m_betChipsCount.ContainsKey(token.Id))
         {
-            m_betTokensCount[token.Id]--;
-            if (m_betTokensCount[token.Id] == 0)
+            m_betChipsCount[token.Id]--;
+            OnBetQuantityChanged?.Invoke();
+            if (m_betChipsCount[token.Id] == 0)
             {
-                m_betTokensCount.Remove(token.Id);
+                m_betChipsCount.Remove(token.Id);
             }
         }
 
         //send to network
         if (sendEvent)
             m_gameManager.BetManager.RemoveChipFromBet(m_stacksManager.Inventory, token.Id);
-
-        UpdateBetButton();
     }
 
-    private void OnBetQuantityChanged(string userId, string tokenId, int totalBetIncrements)
+    private void OnBetChipQuantityChanged(string userId, string tokenId, int totalBetIncrements)
     {
         if (m_stacksManager.Inventory == null || m_stacksManager.Inventory.UserId != userId)
         {
@@ -104,8 +104,7 @@ public class UIIncrementers : MonoBehaviour
 
     private void OnBetConfirmed(bool isBetWon, BetManager.EColor color)
     {
-        m_betTokensCount.Clear();
-        UpdateBetButton();
+        m_betChipsCount.Clear();
     }
 
     public void OnInventoryUpdated(PlayerInventory inventory)
@@ -118,30 +117,6 @@ public class UIIncrementers : MonoBehaviour
                 uiToken.UpdateQuantity();
             }
         }
-    }
-
-    public void OnTurnChanged(string userId)
-    {
-        bool toggle = m_stacksManager.Inventory.UserId == userId;
-
-        foreach (var uiToken in m_uiIncrementers)
-        {
-            uiToken.Toggle(toggle);
-        }
-
-        UpdateBetButton();
-    }
-
-    public void UpdateBetButton()
-    {
-        if(m_betButton == null)
-        {
-            return;
-        }
-
-        bool toggleButton = m_gameManager.BetManager.IsColorSelected && m_betTokensCount.Count > 0;
-
-        m_betButton.interactable = toggleButton;
-    }
+    }    
 
 }

@@ -17,6 +17,8 @@ public class BetManager : MonoBehaviour, IPunObservable
 
     public Action<string, string, int> OnBetChipQuantityChanged;
     public Action<bool,EColor> OnBetConfirmed;
+    public Action<string> OnBetDeclared;
+    public Action OnBetColorChanged;
 
     private PhotonView myPhotonView;
 
@@ -56,7 +58,7 @@ public class BetManager : MonoBehaviour, IPunObservable
         Debug.LogError("Color to guess " + m_currentBetResultColor.ToString());
     }
 
-    #region BET
+    #region BET_CHIPS
 
     public void AddChipToBet(PlayerInventory playerInventory, string chipId)
     {
@@ -144,10 +146,10 @@ public class BetManager : MonoBehaviour, IPunObservable
     public void ChangeBetColor(EColor eColor)
     {
         m_currentSelectedLocalColor = eColor;
+        OnBetColorChanged?.Invoke();
     }
 
     #endregion
-
 
     #region ConfirmBet
 
@@ -184,6 +186,18 @@ public class BetManager : MonoBehaviour, IPunObservable
             //check if all bets have been set and declared
             if(m_confirmedBetsCount < m_playersBetData.Count)
             {
+                //we have one bet declared but missing one
+                
+                //if the bet is from the local player, just send the event for the UI
+                if(playerBetData.UserId == m_gameManager.GetLocalPlayerId())
+                {
+                    OnBetDeclared?.Invoke(playerBetData.UserId);
+                }
+                else
+                {
+                    //else, notify the client the bet is validated but waiting for another player
+                    myPhotonView?.RPC("RPC_DeclareBet_Validated", RpcTarget.Others, playerBetData.UserId);
+                }
                 return;
             }
 
@@ -224,6 +238,13 @@ public class BetManager : MonoBehaviour, IPunObservable
     {
         EColor sentColor = (EColor)colorInt;
         DeclareBet(userId, sentColor);
+    }
+
+    //From Master to client to notify the bet has been validated
+    [PunRPC]
+    private void RPC_DeclareBet_Validated(string userId)
+    {
+        OnBetDeclared?.Invoke(userId);
     }
 
     //From master to client to confirm the bet and update values

@@ -12,5 +12,6 @@ Enlever des trucs de UIInventory ( bet button etc... )
 bug : affichage du nombre de chips quand on depasse 10 bet
 disable bet button when is declared
 text when winning/losing on the ui of the buttons
+checker les materials dans profiler
 
 
