@@ -139,11 +139,6 @@ public class GameManager : MonoBehaviour, IPunObservable
         return m_localPlayerInventory.UserId == PhotonNetwork.LocalPlayer.ActorNumber.ToString() ? m_localPlayerInventory : m_otherPlayerInventory;
     }
 
-    public ChipData GetChipData(string id)
-    {
-        return m_inventorySO.GetChipData(id);
-    }
-
     void IPunObservable.OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
         //We could send other player's mouse position in here

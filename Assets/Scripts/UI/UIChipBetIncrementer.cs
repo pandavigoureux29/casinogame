@@ -16,8 +16,8 @@ public class UIChipBetIncrementer : MonoBehaviour
     private Button m_buttonRemove;
 
     private UIIncrementers m_incrementsManager;
-    private ChipData m_chipData;
-    public ChipData Chip => m_chipData;
+    private ChipInventoryData m_chipInventoryData;
+    public ChipInventoryData Chip => m_chipInventoryData;
 
     private string m_id;
     public string Id => m_id;
@@ -28,7 +28,7 @@ public class UIChipBetIncrementer : MonoBehaviour
     {
         m_incrementsManager = incrementsManager;
         m_id = stack.ChipData.Id;
-        m_chipData = stack.ChipData;
+        m_chipInventoryData = stack.ChipData;
         UpdateQuantity();
         SetPosition(stack);
         SetButtonColor(m_buttonAdd);
@@ -48,14 +48,14 @@ public class UIChipBetIncrementer : MonoBehaviour
 
     public void UpdateQuantity()
     {
-        var qty = m_chipData.Quantity - m_betIncrements;
+        var qty = m_chipInventoryData.Quantity - m_betIncrements;
         UpdateQuantity(qty);
     }
 
     public void OnAddBetClicked()
     {
         var currentBet = m_betIncrements;
-        if( m_chipData.Quantity - currentBet > 0 && m_incrementsManager.TotalBetCount < BetManager.S_MAXIMUM_BET_COUNT)
+        if( m_chipInventoryData.Quantity - currentBet > 0 && m_incrementsManager.TotalBetCount < BetManager.S_MAXIMUM_BET_COUNT)
         {
             m_betIncrements++;
             UpdateQuantity();
@@ -97,9 +97,10 @@ public class UIChipBetIncrementer : MonoBehaviour
 
     private void SetButtonColor(Button button)
     {
+        var chipData = DatabaseManager.Instance.GetChipData(m_chipInventoryData.Id);
         var colors = button.colors;
-        colors.normalColor = m_chipData.Color;
-        colors.selectedColor = m_chipData.Color;
+        colors.normalColor = chipData.Color;
+        colors.selectedColor = chipData.Color;
         button.colors = colors;
     }
 

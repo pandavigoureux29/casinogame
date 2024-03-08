@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 758c4fcb485e624499f4f1be3f1a0ea5, type: 3}
+  m_Name: ChipsData
+  m_EditorClassIdentifier: 
+  Chips:
+  - Id: Blue
+    Material: {fileID: 2100000, guid: 28019c880f2512746a0686b74e6b0c65, type: 2}
+    Color: {r: 0.08784264, g: 0.26066408, b: 0.8867924, a: 1}
+  - Id: BlueSky
+    Material: {fileID: 2100000, guid: c4f94892c155bb7408fb1fa272d882f7, type: 2}
+    Color: {r: 0.07186719, g: 0.72513014, b: 0.8018868, a: 1}
+  - Id: Yellow
+    Material: {fileID: 2100000, guid: 47b6d8c97d8025b44b221c54e070e4a3, type: 2}
+    Color: {r: 0.8862745, g: 0.8803742, b: 0.047058843, a: 1}
+  - Id: Purple
+    Material: {fileID: 2100000, guid: b7c1aa8be2b42d442a5b2a6561748a7c, type: 2}
+    Color: {r: 0.48983195, g: 0.13394445, b: 0.8113208, a: 1}
+  - Id: Pink
+    Material: {fileID: 2100000, guid: e7e376ac3bde7e848a4838de21175e53, type: 2}
+    Color: {r: 0.8679245, g: 0.07778566, b: 0.86616766, a: 1}
+  - Id: Orange
+    Material: {fileID: 2100000, guid: 7d4fbae54e724ab4997e54e29de8287a, type: 2}
+    Color: {r: 0.990566, g: 0.6383601, b: 0.051397298, a: 1}
+  - Id: Brown
+    Material: {fileID: 2100000, guid: 61da50801a03c564dabfbbef4ad75474, type: 2}
+    Color: {r: 0.4433962, g: 0.242849, b: 0.035555363, a: 1}
+  - Id: Greenish
+    Material: {fileID: 2100000, guid: bc1e1a319cc6efc439003e98a7ef2119, type: 2}
+    Color: {r: 0.38014102, g: 0.5943396, b: 0.23268954, a: 1}
+  - Id: Silver
+    Material: {fileID: 2100000, guid: b1e7b7b68110ca64a8a9e55a22d85a31, type: 2}
+    Color: {r: 0.5550908, g: 0.5848947, b: 0.6226415, a: 1}
+  - Id: Gold
+    Material: {fileID: 2100000, guid: 20bd37cb53c40204794a775c5c0f8ba4, type: 2}
+    Color: {r: 0.5566038, g: 0.4998495, b: 0.018378438, a: 1}

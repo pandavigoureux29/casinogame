@@ -6,9 +6,9 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "Data", menuName = "ScriptableObjects/PlayerInventory", order = 1)]
 public class PlayerInventorySO : ScriptableObject
 {
-    public List<ChipData> Chips;
+    public List<ChipInventoryData> Chips;
 
-    public ChipData GetChipData(string chipId)
+    public ChipInventoryData GetChipData(string chipId)
     {
         return Chips.FirstOrDefault(x=>x.Id == chipId);
     }

@@ -4,11 +4,12 @@ using UnityEngine;
 
 public class BetStack : ChipStack
 {
-    public override void Refresh(ChipData chipData, int quantity)
+    public override void Refresh(string chipId, int quantity)
     {
+        var chipData = DatabaseManager.Instance.GetChipData(chipId);
         if(m_chips.Count <= 0)
         {
-            AddChips(chipData, quantity);
+            AddChips(chipId, quantity);
             return;
         }
 
@@ -28,7 +29,7 @@ public class BetStack : ChipStack
             }
         }
 
-        AddChips(chipData, quantity - currentQuantity);
+        AddChips(chipId, quantity - currentQuantity);
         ReplaceAll();
     }
 }

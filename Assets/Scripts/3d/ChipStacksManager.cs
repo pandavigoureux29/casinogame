@@ -19,25 +19,25 @@ public class ChipStacksManager : MonoBehaviour
     public void Initialize(PlayerInventory inventory)
     {
         m_inventory = inventory;
+        if(m_inventory == null)
+        {
+            return;
+        }
+
+        foreach (var chip in m_inventory.Inventory.Chips)
+        {
+            var stack = Instantiate(m_chipStackPrefab, transform);
+            m_stacks[chip.Id] = stack;
+            PlaceStack(stack);
+            stack.Initialize(chip);
+        }
+
         RefreshFromInventory();
     }
 
-    public void AddChips(ChipData chipData, int quantity)
+    public void RefreshChips(string chipId, int quantity)
     {
-        ChipStack stack = GetStack(chipData.Id);
-        stack.AddChips(chipData, quantity);
-    }
-
-    public void RemoveChips(ChipData chipData, int quantity)
-    {
-        ChipStack stack = GetStack(chipData.Id);
-        stack.RemoveChips(chipData, quantity);
-    }
-
-    public void RefreshChips(ChipData chipData, int quantity)
-    {
-        ChipStack stack = GetStack(chipData.Id);
-        stack.Refresh(chipData, quantity);
+        m_stacks[chipId].Refresh(chipId, quantity);
     }
 
     public void Clear()
@@ -70,23 +70,8 @@ public class ChipStacksManager : MonoBehaviour
 
         foreach(var chip in m_inventory.Inventory.Chips)
         {
-            GetStack(chip.Id).Refresh(chip,chip.Quantity);
+            m_stacks[chip.Id].Refresh(chip.Id,chip.Quantity);
         }
     }
 
-    public ChipStack GetStack(string id)
-    {
-        ChipStack stack;
-        if (!m_stacks.ContainsKey(id))
-        {
-            stack = Instantiate(m_chipStackPrefab, transform);
-            m_stacks[id] = stack;
-            PlaceStack(stack);
-        }
-        else
-        {
-            stack = m_stacks[id];
-        }
-        return stack;
-    }
 }

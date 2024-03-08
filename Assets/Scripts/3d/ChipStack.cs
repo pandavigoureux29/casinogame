@@ -12,8 +12,8 @@ public class ChipStack : MonoBehaviour
     [SerializeField]
     private float m_spacing = 0.05f;
 
-    private ChipData m_chipData;
-    public ChipData ChipData => m_chipData;
+    private ChipInventoryData m_chipData;
+    public ChipInventoryData ChipData => m_chipData;
 
     protected List<Chip> m_chips = new List<Chip>();
     protected ChipsPool m_pool = new ChipsPool();
@@ -25,19 +25,21 @@ public class ChipStack : MonoBehaviour
         m_pool.Initialize(m_chipPrefab, m_chipContainer);
     }
 
-    public void AddChips(ChipData chipData, int quantity)
+    public void Initialize(ChipInventoryData chipData)
+    {
+        m_chipData = chipData;
+    }
+
+    public void AddChips(string chipId, int quantity)
     {
         if(quantity <= 0)
         {
             return;
         }
-
-        m_chipData = chipData;
-
         for (int i = 0; i < quantity; i++)
         {
             Chip chip = m_pool.TakeChipFromPool();
-            chip.Refresh(chipData);
+            chip.Refresh(DatabaseManager.Instance.GetChipData(chipId));
             chip.gameObject.SetActive(true);
 
             //place chip
@@ -46,20 +48,10 @@ public class ChipStack : MonoBehaviour
         }
     }
 
-    public void RemoveChips(ChipData chipData, int quantity)
-    {
-        for (int i = 0; i < quantity; i++)
-        {
-            var chip = m_chips[m_chips.Count - 1];
-            m_chips.RemoveAt(m_chips.Count-1);
-            m_pool.ReleaseToPool(chip);
-        }
-    }
-
-    public virtual void Refresh(ChipData chipData, int quantity)
+    public virtual void Refresh(string chipId, int quantity)
     {
         ClearStack();
-        AddChips(chipData, quantity);
+        AddChips(chipId, quantity);
     }
 
     public void ClearStack()
