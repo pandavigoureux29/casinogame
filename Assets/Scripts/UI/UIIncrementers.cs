@@ -58,7 +58,7 @@ public class UIIncrementers : MonoBehaviour
         m_hubManager.OnInitialized -= OnStacksInitialized;
     }
 
-    public void OnAddBetStacked(UIChipBetIncrementer chip, bool sendEvent=true)
+    public void OnAddBetStacked(UIChipBetIncrementer chip)
     {
         if(!m_betChipsCount.ContainsKey(chip.Id))
         {
@@ -66,28 +66,25 @@ public class UIIncrementers : MonoBehaviour
         }
         m_betChipsCount[chip.Id]++;
         m_totalBetCount++;
-        Debug.LogError(m_totalBetCount);
 
-        //send to network
-        if(sendEvent)
-            m_gameManager.BetManager.AddChipToBet(m_stacksManager.Inventory, chip.Id);
+        m_gameManager.BetManager.AddChipToBet(m_stacksManager.Inventory, chip.Id);
     }
 
-    public void OnRemoveBetStacked(UIChipBetIncrementer chip, bool sendEvent = true)
+    public void OnRemoveBetStacked(UIChipBetIncrementer chip)
     {
-        if (m_betChipsCount.ContainsKey(chip.Id))
+        if (!m_betChipsCount.ContainsKey(chip.Id))
         {
-            m_betChipsCount[chip.Id]--;
-            m_totalBetCount--;
-            if (m_betChipsCount[chip.Id] == 0)
-            {
-                m_betChipsCount.Remove(chip.Id);
-            }
+            return;
         }
 
-        //send to network
-        if (sendEvent)
-            m_gameManager.BetManager.RemoveChipFromBet(m_stacksManager.Inventory, chip.Id);
+        m_betChipsCount[chip.Id]--;
+        m_totalBetCount--;
+        if (m_betChipsCount[chip.Id] == 0)
+        {
+            m_betChipsCount.Remove(chip.Id);
+        }
+
+        m_gameManager.BetManager.RemoveChipFromBet(m_stacksManager.Inventory, chip.Id);
     }
 
     private void OnBetChipQuantityChanged(string userId, string chipId, int totalBetIncrements)
