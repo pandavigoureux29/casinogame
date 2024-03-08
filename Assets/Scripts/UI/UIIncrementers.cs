@@ -24,8 +24,6 @@ public class UIIncrementers : MonoBehaviour
 
     public bool HasAddedChips => m_betChipsCount.Count > 0;
 
-    public Action OnBetQuantityChanged;
-
     private void Awake()
     {
         m_hubManager.OnInitialized += OnStacksInitialized;
@@ -64,7 +62,6 @@ public class UIIncrementers : MonoBehaviour
             m_betChipsCount[token.Id] = 0;
         }
         m_betChipsCount[token.Id]++;
-        OnBetQuantityChanged?.Invoke();
 
         //send to network
         if(sendEvent)
@@ -76,7 +73,6 @@ public class UIIncrementers : MonoBehaviour
         if (m_betChipsCount.ContainsKey(token.Id))
         {
             m_betChipsCount[token.Id]--;
-            OnBetQuantityChanged?.Invoke();
             if (m_betChipsCount[token.Id] == 0)
             {
                 m_betChipsCount.Remove(token.Id);

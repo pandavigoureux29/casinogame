@@ -1,8 +1,11 @@
 using Photon.Pun.Demo.PunBasics;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
+using static UIColorSelector;
 
 public class UIBetButton : MonoBehaviour
 {
@@ -10,6 +13,8 @@ public class UIBetButton : MonoBehaviour
     private GameManager m_gameManager;
     [SerializeField]
     private UIIncrementers m_uiIncrementers;
+    [SerializeField]
+    private UIColorSelector m_colorSelector;
 
     private Button m_button;
 
@@ -23,6 +28,7 @@ public class UIBetButton : MonoBehaviour
         m_gameManager.BetManager.OnBetColorChanged += OnBetColorChanged;
         m_gameManager.BetManager.OnBetChipQuantityChanged += OnBetChipQuantityChanged;
         UpdateBetButton();
+        m_colorSelector.RefreshColor(BetManager.EColor.NONE);
     }
 
     private void OnDestroy()
@@ -37,12 +43,14 @@ public class UIBetButton : MonoBehaviour
     }
     private void OnBetConfirmed(bool isBetWon, BetManager.EColor color)
     {
+        m_colorSelector.RefreshColor(BetManager.EColor.NONE);
         m_betDeclared = false;
         UpdateBetButton();
     }
 
-    private void OnBetColorChanged()
+    private void OnBetColorChanged(BetManager.EColor color)
     {
+        m_colorSelector.RefreshColor(color);
         UpdateBetButton();
     }
 
@@ -62,11 +70,6 @@ public class UIBetButton : MonoBehaviour
 
     public void UpdateBetButton()
     {
-        if (m_button == null)
-        {
-            return;
-        }
-
         bool toggleButton = m_gameManager.BetManager.IsColorSelected && m_uiIncrementers.HasAddedChips && !m_betDeclared;
         m_button.interactable = toggleButton;
     }

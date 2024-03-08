@@ -18,7 +18,7 @@ public class BetManager : MonoBehaviour, IPunObservable
     public Action<string, string, int> OnBetChipQuantityChanged;
     public Action<bool,EColor> OnBetConfirmed;
     public Action<string> OnBetDeclared;
-    public Action OnBetColorChanged;
+    public Action<EColor> OnBetColorChanged;
 
     private PhotonView myPhotonView;
 
@@ -146,7 +146,7 @@ public class BetManager : MonoBehaviour, IPunObservable
     public void ChangeBetColor(EColor eColor)
     {
         m_currentSelectedLocalColor = eColor;
-        OnBetColorChanged?.Invoke();
+        OnBetColorChanged?.Invoke(eColor);
     }
 
     #endregion
