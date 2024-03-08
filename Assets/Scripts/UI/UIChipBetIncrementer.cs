@@ -15,18 +15,18 @@ public class UIChipBetIncrementer : MonoBehaviour
     [SerializeField]
     private Button m_buttonRemove;
 
-    private UIIncrementers m_uiTokenInventory;
+    private UIIncrementers m_incrementsManager;
     private ChipData m_chipData;
-    public ChipData Token => m_chipData;
+    public ChipData Chip => m_chipData;
 
     private string m_id;
     public string Id => m_id;
 
     private int m_betIncrements = 0;
 
-    public void InitializeToken(UIIncrementers inventory, ChipStack stack)
+    public void InitializeChip(UIIncrementers incrementsManager, ChipStack stack)
     {
-        m_uiTokenInventory = inventory;
+        m_incrementsManager = incrementsManager;
         m_id = stack.ChipData.Id;
         m_chipData = stack.ChipData;
         UpdateQuantity();
@@ -55,11 +55,11 @@ public class UIChipBetIncrementer : MonoBehaviour
     public void OnAddBetClicked()
     {
         var currentBet = m_betIncrements;
-        if( m_chipData.Quantity - currentBet > 0)
+        if( m_chipData.Quantity - currentBet > 0 && m_incrementsManager.TotalBetCount < BetManager.S_MAXIMUM_BET_COUNT)
         {
             m_betIncrements++;
             UpdateQuantity();
-            m_uiTokenInventory.OnAddBetStacked(this);
+            m_incrementsManager.OnAddBetStacked(this);
         }
     }
 
@@ -69,7 +69,7 @@ public class UIChipBetIncrementer : MonoBehaviour
         {
             m_betIncrements--;
             UpdateQuantity();
-            m_uiTokenInventory.OnRemoveBetStacked(this);
+            m_incrementsManager.OnRemoveBetStacked(this);
         }
     }
 

@@ -54,7 +54,7 @@ public class UIBetButton : MonoBehaviour
         UpdateBetButton();
     }
 
-    private void OnBetChipQuantityChanged(string userId, string tokenId, int totalBetIncrements)
+    private void OnBetChipQuantityChanged(string userId, string chipId, int totalBetIncrements)
     {
         UpdateBetButton();
     }

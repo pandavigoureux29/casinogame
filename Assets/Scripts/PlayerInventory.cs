@@ -12,7 +12,7 @@ public class PlayerInventory
     public PlayerInventorySO Inventory => m_inventory;
 
     private int m_totalChipsCount = 0;
-    public int TotalTokensCount => m_totalChipsCount;
+    public int TotalChipsCount => m_totalChipsCount;
 
     public PlayerInventory(string userId, PlayerInventorySO playerInventorySO)
     {
@@ -47,19 +47,19 @@ public class PlayerInventory
         }
     }
 
-    public void GetTokensForNetwork(out List<string> keys, out List<int> values)
+    public void GetChipsForNetwork(out List<string> keys, out List<int> values)
     {
         keys = new List<string>();
         values = new List<int>();
 
-        foreach (var token in m_inventory.Chips)
+        foreach (var chip in m_inventory.Chips)
         {
-            keys.Add(token.Id);
-            values.Add(token.Quantity);
+            keys.Add(chip.Id);
+            values.Add(chip.Quantity);
         }
     }
 
-    public void UpdateTokensFromNetwork(string[] keys, int[] values)
+    public void UpdateChipsFromNetwork(string[] keys, int[] values)
     {
         for(int i = 0; i < keys.Length; i++)
         {

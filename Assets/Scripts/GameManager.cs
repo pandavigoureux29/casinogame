@@ -87,30 +87,30 @@ public class GameManager : MonoBehaviour, IPunObservable
         OnInventoriesInitialized?.Invoke(m_localPlayerInventory, m_otherPlayerInventory);
     }       
 
-    public void ConfirmBet_Master(string userId, Dictionary<string, int> betTokensCount, bool win)
+    public void ConfirmBet_Master(string userId, Dictionary<string, int> betChipsCount, bool win)
     {
         if (PhotonNetwork.IsMasterClient)
         {
             var inventory = GetInventory(userId);
-            foreach(var key in betTokensCount.Keys.ToList())
+            foreach(var key in betChipsCount.Keys.ToList())
             {
                 if (!win)
                 {
-                    betTokensCount[key] *= -1;
+                    betChipsCount[key] *= -1;
                 }
             }
             //apply the bet to inventory and update client's
-            inventory.UpdateQuantities(betTokensCount);
+            inventory.UpdateQuantities(betChipsCount);
 
             //reset condition
-            if(inventory.TotalTokensCount <= 0)
+            if(inventory.TotalChipsCount <= 0)
             {
                 inventory.Reset(m_inventorySO);
             }
 
             List<string> keys;
             List<int> values;
-            inventory.GetTokensForNetwork(out keys, out values);
+            inventory.GetChipsForNetwork(out keys, out values);
             myPhotonView?.RPC("RPC_UpdateInventory", RpcTarget.Others, userId, keys.ToArray(), values.ToArray());
 
             OnInventoryUpdated?.Invoke(inventory);        }
@@ -120,7 +120,7 @@ public class GameManager : MonoBehaviour, IPunObservable
     public void RPC_UpdateInventory(string userId, string[] keys, int[] values)
     {
         var inventory = GetInventory(userId);
-        inventory.UpdateTokensFromNetwork(keys,values);
+        inventory.UpdateChipsFromNetwork(keys,values);
         OnInventoryUpdated?.Invoke(inventory);
     }
 

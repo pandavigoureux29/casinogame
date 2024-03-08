@@ -19,7 +19,7 @@ public class BetStack : ChipStack
         //remove exceeding quantity
         for(int i = m_chips.Count-1; i >= 0; i--)
         {
-            if (m_chips[i].TokenId == chipData.Id)
+            if (m_chips[i].ChipId == chipData.Id)
             {
                 currentQuantity++;
                 if (currentQuantity > quantity)

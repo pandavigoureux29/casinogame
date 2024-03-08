@@ -5,12 +5,6 @@ Flow:
 2. Select the color you wanna bet on (ChangeBetColor in BetManager)
 3. Click on BET !! and set if you won (DeclareBet in BetManager)
 
-
-optional :
-Enlever des trucs de UIInventory ( bet button etc... )
-
-bug : affichage du nombre de chips quand on depasse 10 bet
-disable bet button when is declared
 text when winning/losing on the ui of the buttons
 checker les materials dans profiler
 

@@ -7,12 +7,14 @@ public class Chip : MonoBehaviour
     [SerializeField]
     private MeshRenderer m_renderer;
 
-    private string m_tokenId;
-    public string TokenId => m_tokenId;
+    private string m_chipId;
+    public string ChipId => m_chipId;
 
     public void Refresh(ChipData chipData)
     {
-        m_tokenId = chipData.Id;
-        m_renderer.material = chipData.Material;
+        m_chipId = chipData.Id;
+        //all chips can share the same material as there nothing in the design
+        //that tells us that a single chip will need a unique instantiated material
+        m_renderer.sharedMaterial = chipData.Material;
     }
 }

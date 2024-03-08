@@ -10,7 +10,7 @@ public class BetManager : MonoBehaviour, IPunObservable
 {
     public enum EColor {NONE, GREEN, RED }
 
-    private static int S_MAXIMUM_BET_COUNT = 10;
+    public static int S_MAXIMUM_BET_COUNT = 10;
 
     [SerializeField]
     private GameManager m_gameManager;
@@ -330,16 +330,16 @@ public class BetManager : MonoBehaviour, IPunObservable
 
         public bool IsBetValid()
         {
-            bool hasAtLeastOneBetToken = false;
-            foreach (var token in BetChipsCount)
+            bool hasAtLeastOneBetChip = false;
+            foreach (var chip in BetChipsCount)
             {
-                if (token.Value > 0)
+                if (chip.Value > 0)
                 {
-                    hasAtLeastOneBetToken = true;
+                    hasAtLeastOneBetChip = true;
                 }
             }
 
-            return hasAtLeastOneBetToken && ColorBet != EColor.NONE;
+            return hasAtLeastOneBetChip && ColorBet != EColor.NONE;
         }
     }
 }
