@@ -55,7 +55,7 @@ public class BetManager : MonoBehaviour, IPunObservable
     {
         var r = UnityEngine.Random.Range(1, 100);
         m_currentBetResultColor = r <= 50 ? EColor.GREEN : EColor.RED;
-        Debug.LogError("Color to guess " + m_currentBetResultColor.ToString());
+        //Debug.LogError("Color to guess " + m_currentBetResultColor.ToString());
     }
 
     #region BET_CHIPS
