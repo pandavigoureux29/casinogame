@@ -15,6 +15,11 @@ public class UIChipBetIncrementer : MonoBehaviour
     [SerializeField]
     private Button m_buttonRemove;
 
+    [SerializeField]
+    private Animator m_earningsTextAnimator;
+    [SerializeField]
+    private TextMeshProUGUI m_earningsText;
+
     private UIIncrementers m_incrementsManager;
     private ChipInventoryData m_chipInventoryData;
     public ChipInventoryData Chip => m_chipInventoryData;
@@ -23,6 +28,8 @@ public class UIChipBetIncrementer : MonoBehaviour
     public string Id => m_id;
 
     private int m_betIncrements = 0;
+
+    private int m_lastQuantity = 0;
 
     public void InitializeChip(UIIncrementers incrementsManager, ChipStack stack)
     {
@@ -33,6 +40,7 @@ public class UIChipBetIncrementer : MonoBehaviour
         SetPosition(stack);
         SetButtonColor(m_buttonAdd);
         SetButtonColor(m_buttonRemove);
+        m_lastQuantity = m_chipInventoryData.Quantity;
     }
 
     public void Toggle(bool toggle)
@@ -41,13 +49,23 @@ public class UIChipBetIncrementer : MonoBehaviour
         m_buttonRemove.gameObject.SetActive(toggle);
     }
 
-    public void UpdateQuantity(int qty)
+    private void UpdateQuantity(int qty)
     {
         m_quantityText.text = "x" + qty;
     }
 
-    public void UpdateQuantity()
+    public void UpdateQuantity(bool isInventoryUpdate = false)
     {
+        if (isInventoryUpdate)
+        {
+            var delta = m_chipInventoryData.Quantity - m_lastQuantity;
+            if(delta != 0)
+            {
+                m_lastQuantity = m_chipInventoryData.Quantity;
+                ShowEarnings(delta);
+            }
+        }
+
         var qty = m_chipInventoryData.Quantity - m_betIncrements;
         UpdateQuantity(qty);
     }
@@ -84,15 +102,16 @@ public class UIChipBetIncrementer : MonoBehaviour
         UpdateQuantity();
     }
 
-    public void UpdateIncrement(int increments)
-    {
-        m_betIncrements = increments;
-        UpdateQuantity();
-    }
-
     public void ClearBetStacks()
     {
         m_betIncrements = 0;
+    }
+
+    private void ShowEarnings(int qty)
+    {
+        string trigger = qty > 0 ? "Win" : "Lose";
+        m_earningsTextAnimator.SetTrigger(trigger);
+        m_earningsText.text = qty > 0 ? "+"+qty : "-"+qty; ;
     }
 
     private void SetButtonColor(Button button)

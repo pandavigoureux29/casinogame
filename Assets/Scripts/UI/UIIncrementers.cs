@@ -32,7 +32,6 @@ public class UIIncrementers : MonoBehaviour
         m_hubManager.OnInitialized += OnStacksInitialized;
         m_gameManager.BetManager.OnBetConfirmed += OnBetConfirmed;
         m_gameManager.OnInventoryUpdated += OnInventoryUpdated;
-        m_gameManager.BetManager.OnBetChipQuantityChanged += OnBetChipQuantityChanged;
     }
 
     private void OnDestroy()
@@ -41,7 +40,6 @@ public class UIIncrementers : MonoBehaviour
         {
             m_gameManager.BetManager.OnBetConfirmed -= OnBetConfirmed;
             m_gameManager.OnInventoryUpdated -= OnInventoryUpdated;
-            m_gameManager.BetManager.OnBetChipQuantityChanged -= OnBetChipQuantityChanged;
         }
     }
 
@@ -87,20 +85,6 @@ public class UIIncrementers : MonoBehaviour
         m_gameManager.BetManager.RemoveChipFromBet(m_stacksManager.Inventory, chip.Id);
     }
 
-    private void OnBetChipQuantityChanged(string userId, string chipId, int totalBetIncrements)
-    {
-        if (m_stacksManager.Inventory == null || m_stacksManager.Inventory.UserId != userId)
-        {
-            return;
-        }
-
-        var uiChip = m_uiIncrementers.Find(x => x.Id == chipId);
-        if (uiChip != null)
-        {
-            uiChip.UpdateIncrement(totalBetIncrements);
-        }
-    }
-
     private void OnBetConfirmed(bool isBetWon, BetManager.EColor color)
     {
         m_betChipsCount.Clear();
@@ -114,7 +98,7 @@ public class UIIncrementers : MonoBehaviour
             foreach (var uiChipIncrementer in m_uiIncrementers)
             {
                 uiChipIncrementer.ClearBetStacks();
-                uiChipIncrementer.UpdateQuantity();
+                uiChipIncrementer.UpdateQuantity(true);
             }
         }
     }    
