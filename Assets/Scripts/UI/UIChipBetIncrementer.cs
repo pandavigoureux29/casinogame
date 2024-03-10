@@ -102,6 +102,12 @@ public class UIChipBetIncrementer : MonoBehaviour
         UpdateQuantity();
     }
 
+    public void UpdateIncrement(int increments)
+    {
+        m_betIncrements = increments;
+        UpdateQuantity();
+    }
+
     public void ClearBetStacks()
     {
         m_betIncrements = 0;

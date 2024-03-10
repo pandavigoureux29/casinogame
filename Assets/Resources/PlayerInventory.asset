@@ -14,42 +14,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Chips:
   - Id: Blue
-    Quantity: 10
-    Material: {fileID: 2100000, guid: 28019c880f2512746a0686b74e6b0c65, type: 2}
-    Color: {r: 0.101326115, g: 0.28910235, b: 0.9339623, a: 1}
+    Quantity: 1
   - Id: BlueSky
-    Quantity: 10
-    Material: {fileID: 2100000, guid: c4f94892c155bb7408fb1fa272d882f7, type: 2}
-    Color: {r: 0.1760413, g: 0.81092465, b: 0.8679245, a: 1}
+    Quantity: 1
   - Id: Yellow
-    Quantity: 10
-    Material: {fileID: 2100000, guid: 47b6d8c97d8025b44b221c54e070e4a3, type: 2}
-    Color: {r: 0.987109, g: 0.990566, b: 0.051397298, a: 1}
+    Quantity: 1
   - Id: Purple
-    Quantity: 10
-    Material: {fileID: 2100000, guid: b7c1aa8be2b42d442a5b2a6561748a7c, type: 2}
-    Color: {r: 0.55155134, g: 0.11173906, b: 0.8773585, a: 1}
+    Quantity: 1
   - Id: Pink
-    Quantity: 10
-    Material: {fileID: 2100000, guid: e7e376ac3bde7e848a4838de21175e53, type: 2}
-    Color: {r: 0.87653977, g: 0.062077243, b: 0.8773585, a: 1}
+    Quantity: 1
   - Id: Orange
-    Quantity: 10
-    Material: {fileID: 2100000, guid: 7d4fbae54e724ab4997e54e29de8287a, type: 2}
-    Color: {r: 1, g: 0.52179044, b: 0, a: 1}
+    Quantity: 1
   - Id: Brown
-    Quantity: 10
-    Material: {fileID: 2100000, guid: 61da50801a03c564dabfbbef4ad75474, type: 2}
-    Color: {r: 0.33962262, g: 0.2142115, b: 0.040049832, a: 1}
+    Quantity: 1
   - Id: Greenish
-    Quantity: 10
-    Material: {fileID: 2100000, guid: bc1e1a319cc6efc439003e98a7ef2119, type: 2}
-    Color: {r: 0.13880128, g: 0.6698113, b: 0.0473923, a: 1}
+    Quantity: 1
   - Id: Silver
-    Quantity: 10
-    Material: {fileID: 2100000, guid: b1e7b7b68110ca64a8a9e55a22d85a31, type: 2}
-    Color: {r: 0.6792453, g: 0.6696333, b: 0.6696333, a: 1}
+    Quantity: 1
   - Id: Gold
-    Quantity: 10
-    Material: {fileID: 2100000, guid: 20bd37cb53c40204794a775c5c0f8ba4, type: 2}
-    Color: {r: 0.5, g: 0.45411593, b: 0.054245293, a: 1}
+    Quantity: 1

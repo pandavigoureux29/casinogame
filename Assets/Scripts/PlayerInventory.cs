@@ -31,7 +31,7 @@ public class PlayerInventory
 
     public bool CanBetMore(string chipId, int currentBet)
     {
-        return GetQuantity(chipId) - currentBet > 0;
+        return GetQuantity(chipId) - currentBet >= 0;
     }
 
     public void UpdateQuantities(Dictionary<string, int> betChipIncrementsCount)

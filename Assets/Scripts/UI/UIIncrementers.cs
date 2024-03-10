@@ -2,6 +2,7 @@ using Newtonsoft.Json.Bson;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -22,16 +23,15 @@ public class UIIncrementers : MonoBehaviour
     private List<UIChipBetIncrementer> m_uiIncrementers = new List<UIChipBetIncrementer>();
     private Dictionary<string, int> m_betChipsCount = new Dictionary<string, int>();
 
-    public bool HasAddedChips => m_totalBetCount > 0;
-
-    private int m_totalBetCount = 0;
-    public int TotalBetCount => m_totalBetCount;
+    public bool HasAddedChips => TotalBetCount > 0;
+    public int TotalBetCount => m_betChipsCount.Sum(x=>x.Value);
 
     private void Awake()
     {
         m_hubManager.OnInitialized += OnStacksInitialized;
         m_gameManager.BetManager.OnBetConfirmed += OnBetConfirmed;
         m_gameManager.OnInventoryUpdated += OnInventoryUpdated;
+        m_gameManager.BetManager.OnBetChipQuantityChanged += OnBetChipQuantityChanged;
     }
 
     private void OnDestroy()
@@ -40,6 +40,7 @@ public class UIIncrementers : MonoBehaviour
         {
             m_gameManager.BetManager.OnBetConfirmed -= OnBetConfirmed;
             m_gameManager.OnInventoryUpdated -= OnInventoryUpdated;
+            m_gameManager.BetManager.OnBetChipQuantityChanged -= OnBetChipQuantityChanged;
         }
     }
 
@@ -63,7 +64,6 @@ public class UIIncrementers : MonoBehaviour
             m_betChipsCount[chip.Id] = 0;
         }
         m_betChipsCount[chip.Id]++;
-        m_totalBetCount++;
 
         m_gameManager.BetManager.AddChipToBet(m_stacksManager.Inventory, chip.Id);
     }
@@ -76,7 +76,6 @@ public class UIIncrementers : MonoBehaviour
         }
 
         m_betChipsCount[chip.Id]--;
-        m_totalBetCount--;
         if (m_betChipsCount[chip.Id] == 0)
         {
             m_betChipsCount.Remove(chip.Id);
@@ -85,10 +84,29 @@ public class UIIncrementers : MonoBehaviour
         m_gameManager.BetManager.RemoveChipFromBet(m_stacksManager.Inventory, chip.Id);
     }
 
+    //update values from server
+    private void OnBetChipQuantityChanged(string userId, string chipId, int totalBetIncrements)
+    {
+        if (m_stacksManager.Inventory == null || m_stacksManager.Inventory.UserId != userId)
+        {
+            return;
+        }
+
+        var uiChip = m_uiIncrementers.Find(x => x.Id == chipId);
+        if (uiChip != null)
+        {
+            uiChip.UpdateIncrement(totalBetIncrements);
+        }
+
+        if (m_betChipsCount.ContainsKey(chipId))
+        {
+            m_betChipsCount[chipId] = totalBetIncrements;
+        }
+    }
+
     private void OnBetConfirmed(bool isBetWon, BetManager.EColor color)
     {
         m_betChipsCount.Clear();
-        m_totalBetCount = 0;
     }
 
     public void OnInventoryUpdated(PlayerInventory inventory)

@@ -206,7 +206,6 @@ public class BetManager : MonoBehaviour, IPunObservable
                 bool win = m_currentBetResultColor == bet.ColorBet;
 
                 m_gameManager.ConfirmBet_Master(bet.UserId, bet.BetChipsCount, win);
-                Debug.LogError("Bet " + bet.ColorBet + " for " + userId + " : " + win);
 
                 if (bet.UserId == m_gameManager.GetLocalPlayerId())
                 {
