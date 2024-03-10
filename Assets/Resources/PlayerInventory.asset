@@ -14,22 +14,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Chips:
   - Id: Blue
-    Quantity: 1
+    Quantity: 10
   - Id: BlueSky
-    Quantity: 1
+    Quantity: 10
   - Id: Yellow
-    Quantity: 1
+    Quantity: 10
   - Id: Purple
-    Quantity: 1
+    Quantity: 10
   - Id: Pink
-    Quantity: 1
+    Quantity: 10
   - Id: Orange
-    Quantity: 1
+    Quantity: 10
   - Id: Brown
-    Quantity: 1
+    Quantity: 10
   - Id: Greenish
-    Quantity: 1
+    Quantity: 10
   - Id: Silver
-    Quantity: 1
+    Quantity: 10
   - Id: Gold
-    Quantity: 1
+    Quantity: 10
